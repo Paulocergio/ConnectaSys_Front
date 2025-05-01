@@ -102,22 +102,25 @@ export default function Menu() {
             </a>
             
             <a 
-              href="/login" 
-              className={`
-                flex items-center space-x-2 px-5 py-2 rounded-lg text-sm font-medium
-                transition-all duration-300 relative overflow-hidden group
-                ${scrolled 
-                  ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/20' 
-                  : 'bg-white/10 backdrop-blur-sm border border-white/10 text-white hover:bg-white/20'
-                }
-              `}
-            >
-              <span className="relative z-10">Entrar</span>
-              <LogIn size={16} className="relative z-10" />
-              
-              {/* Button hover effect */}
-              <span className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            </a>
+  href="/login"
+  onClick={(e) => {
+    e.preventDefault();
+    window.location.href = '/login';
+  }}
+  className={`
+    flex items-center space-x-2 px-5 py-2 rounded-lg text-sm font-medium
+    transition-all duration-300 relative overflow-hidden group
+    ${scrolled 
+      ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/20' 
+      : 'bg-white/10 backdrop-blur-sm border border-white/10 text-white hover:bg-white/20'
+    }
+  `}
+>
+  <span className="relative z-10">Entrar</span>
+  <LogIn size={16} className="relative z-10" />
+  <span className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+</a>
+
           </div>
         </div>
 
