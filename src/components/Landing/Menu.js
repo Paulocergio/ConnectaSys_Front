@@ -48,8 +48,8 @@ export default function Menu() {
     <nav 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled 
-          ? 'py-3 bg-[#030912]/90 backdrop-blur-lg shadow-lg shadow-black/10 border-b border-indigo-500/10' 
-          : 'py-5 bg-transparent'
+               ? 'py-3 bg-white text-black shadow-lg ...' 
+              : 'py-5 bg-white text-black'
       }`}
     >
       <div className="container mx-auto px-6 flex justify-between items-center">

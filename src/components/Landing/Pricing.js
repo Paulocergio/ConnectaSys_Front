@@ -79,16 +79,15 @@ export default function Pricing() {
   };
 
   return (
-    <section id="planos" className="py-24 px-6 relative overflow-hidden">
+<section id="planos" className="py-24 px-6 bg-white text-black relative overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#03060C] to-[#050F24] z-0"></div>
+      <div className="absolute inset-0 bg-white z-0"></div>
       
       {/* Decorative Elements */}
       <div className="absolute top-40 -right-32 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-20 -left-32 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl"></div>
       
-      {/* Grid Pattern */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgMjAgMTAgTSAxMCAwIEwgMTAgMjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzExMTkyNyIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-10 z-0"></div>
+    
       
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}

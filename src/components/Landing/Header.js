@@ -18,10 +18,7 @@ export default function Header() {
   ];
 
   return (
-    <section 
-      id="sobre" 
-      className="relative min-h-screen flex items-center overflow-hidden bg-[#010103] pt-20"
-    >
+     <section id="sobre" className="relative min-h-screen flex items-center overflow-hidden bg-white text-black pt-20">
       {/* Starfield background */}
       <div className="absolute inset-0 z-0">
         <div id="stars"></div>

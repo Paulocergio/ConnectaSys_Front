@@ -130,14 +130,12 @@ export default function Testimonials() {
   };
   
   return (
-    <section 
-      id="depoimentos" 
-      className="py-24 px-6 relative overflow-hidden"
+    <section id="depoimentos" className="py-24 px-6 relative overflow-hidden bg-white text-black"
       onMouseEnter={pauseAutoplay}
       onMouseLeave={resumeAutoplay}
     >
       {/* Background with gradient and patterns */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#030912] to-[#070F1E] z-0"></div>
+      <div className="absolute inset-0 bg-white z-0"></div>
       
       {/* Decorative Elements */}
       <div className="absolute top-20 -right-40 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl"></div>
@@ -166,10 +164,10 @@ export default function Testimonials() {
         </div>
         
         {/* Testimonials Carousel */}
-        <div className="relative bg-gradient-to-b from-[#060D1A] to-[#040810] rounded-2xl border border-gray-800/50 p-1 shadow-xl">
+        <div className="relative bg-white rounded-2xl border …">
           {/* Inner Container with Gradient Border Effect */}
-          <div className="bg-[#050B16] rounded-xl overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 via-transparent to-purple-500/5 z-0"></div>
+          <div className="bg-white rounded-xl overflow-hidden relative">
+          <div className="absolute inset-0 bg-white z-0"></div>
             
             {/* Main Carousel */}
             <div className="relative overflow-hidden">
