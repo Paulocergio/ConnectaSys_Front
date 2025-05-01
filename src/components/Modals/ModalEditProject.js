@@ -22,11 +22,11 @@ export default function ModalEditProject({ isOpen, onClose, project, onSave }) {
   const statusOptions = ['Pendente', 'Em andamento', 'Concluído', 'Cancelado'];
 
   return (
-<div className="fixed inset-0 z-50 flex items-center justify-center">
-<div className="bg-white rounded-lg shadow-lg w-full max-w-md mx-4 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-md mx-4 overflow-hidden">
         <div className="p-6">
           <h2 className="text-xl font-medium text-gray-800 mb-6">Editar Projeto</h2>
-          
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm text-gray-700 mb-1">Nome do projeto</label>
@@ -39,7 +39,7 @@ export default function ModalEditProject({ isOpen, onClose, project, onSave }) {
                 required
               />
             </div>
-            
+
             <div>
               <label className="block text-sm text-gray-700 mb-1">Status</label>
               <select
@@ -55,7 +55,7 @@ export default function ModalEditProject({ isOpen, onClose, project, onSave }) {
                 ))}
               </select>
             </div>
-            
+
             <div>
               <label className="block text-sm text-gray-700 mb-1">Progresso (%)</label>
               <input
@@ -72,15 +72,15 @@ export default function ModalEditProject({ isOpen, onClose, project, onSave }) {
             </div>
 
             <div className="flex justify-end space-x-3 pt-4">
-              <button 
-                type="button" 
-                onClick={onClose} 
+              <button
+                type="button"
+                onClick={onClose}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none"
               >
                 Cancelar
               </button>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none"
               >
                 Salvar
