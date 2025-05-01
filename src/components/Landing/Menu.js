@@ -46,12 +46,12 @@ export default function Menu() {
   
   return (
     <nav 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled 
-               ? 'py-3 bg-white text-black shadow-lg ...' 
-              : 'py-5 bg-white text-black'
-      }`}
-    >
+   className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+     scrolled 
+      ? 'py-3 bg-[#101218] text-white shadow-lg ...' 
+       : 'py-5 bg-[#101218] text-white'
+   }`}
+ >
       <div className="container mx-auto px-6 flex justify-between items-center">
         {/* Logo */}
         <div className="flex items-center">

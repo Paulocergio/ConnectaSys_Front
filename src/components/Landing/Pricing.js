@@ -79,9 +79,9 @@ export default function Pricing() {
   };
 
   return (
-<section id="planos" className="py-24 px-6 bg-white text-black relative overflow-hidden">
+<section id="planos" className="py-24 px-6 bg-[#101218] text-white relative overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-white z-0"></div>
+      <div className="absolute inset-0 bg-[#101218] z-0"></div>
       
       {/* Decorative Elements */}
       <div className="absolute top-40 -right-32 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl"></div>

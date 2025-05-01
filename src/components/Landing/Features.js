@@ -56,7 +56,7 @@ export default function Features() {
   };
 
   return (
-<section id="funcionalidades" className="py-24 px-6 bg-white text-black">
+<section id="funcionalidades" className="py-24 px-6 bg-[ #101218] text-white">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: -20 }}

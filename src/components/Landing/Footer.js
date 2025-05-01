@@ -5,7 +5,7 @@ import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer id="contato" className="bg-white text-black py-12">
+    <footer id="contato" className="bg-[#101218] text-white py-12">
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row items-start justify-between">
           <div className="mb-8 md:mb-0">

@@ -10,7 +10,7 @@ import Footer from "../components/Landing/Footer";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#03060C] text-gray-100">
+    <div className="min-h-screen bg-[#101218] text-gray-100">
       <Menu />
       <Header />
       <Features />
