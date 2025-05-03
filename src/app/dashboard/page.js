@@ -4,14 +4,47 @@ import Sidebar from '../../components/Sidebar';
 import Table from '../../components/Table';
 import ModalEditProject from '../../components/Modals/ModalEditProject';   
 import ModalConfirmDelete from '../../components/modals/ModalConfirmDelete';
+import { Edit, Trash2 } from 'lucide-react';
 
 export default function DashboardPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [projects, setProjects] = useState([
-    { id: 1, name: 'Website Redesign', status: 'Em andamento', progress: '75%' },
-    { id: 2, name: 'App Mobile', status: 'Em andamento', progress: '40%' },
-    { id: 3, name: 'Campanha Marketing', status: 'Concluído', progress: '100%' },
-    { id: 4, name: 'Sistema ERP', status: 'Pendente', progress: '10%' }
+    { 
+      id: 1, 
+      name: 'Website Redesign', 
+      status: 'Em andamento', 
+      progress: '75%',
+      client: 'Empresa XYZ',
+      priority: 'Alta',
+      category: 'Design'
+    },
+    { 
+      id: 2, 
+      name: 'App Mobile', 
+      status: 'Em andamento', 
+      progress: '40%',
+      client: 'Startup ABC',
+      priority: 'Média',
+      category: 'Desenvolvimento'
+    },
+    { 
+      id: 3, 
+      name: 'Campanha Marketing', 
+      status: 'Concluído', 
+      progress: '100%',
+      client: 'Loja Virtual',
+      priority: 'Baixa',
+      category: 'Marketing'
+    },
+    { 
+      id: 4, 
+      name: 'Sistema ERP', 
+      status: 'Pendente', 
+      progress: '10%',
+      client: 'Indústria MNO',
+      priority: 'Alta',
+      category: 'Desenvolvimento'
+    }
   ]);
   const [editProject, setEditProject] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -33,43 +66,59 @@ export default function DashboardPage() {
     setIsEditModalOpen(true);
   };
 
-  const handleDelete = (row) => {
-    setProjects(projects.filter(p => p.id !== row.id));
-  };
-
   const openDeleteModal = (row) => {
     setProjectToDelete(row);
     setIsDeleteModalOpen(true);
   };
   
   const confirmDelete = () => {
-    setProjects(prev => prev.filter(p => p.id !== projectToDelete.id));
+    if (projectToDelete) {
+      setProjects(prev => prev.filter(p => p.id !== projectToDelete.id));
+      setIsDeleteModalOpen(false);
+    }
   };
 
   const handleSaveEdit = (updatedProject) => {
     setProjects((prev) =>
       prev.map((p) => (p.id === updatedProject.id ? updatedProject : p))
     );
+    setIsEditModalOpen(false);
   };
 
   const columns = [
-    { title: 'Nome', key: 'name' },
-    { title: 'Status', key: 'status' },
-    { title: 'Progresso', key: 'progress' },
+    { 
+      title: 'Nome', 
+      key: 'name', 
+      sortable: true,
+      filterable: true
+    },
+    { 
+      title: 'Cliente', 
+      key: 'client', 
+      sortable: true,
+      filterable: true
+    },
+    { 
+      title: 'Status', 
+      key: 'status', 
+      sortable: true,
+      filterable: true
+    },
+    { 
+      title: 'Progresso', 
+      key: 'progress', 
+      sortable: true 
+    },
     {
       title: 'Ações',
       key: 'actions',
-      render: (_, row) => (
-        <div className="flex space-x-2">
-          <button onClick={() => handleEdit(row)} className="text-blue-600">✏️</button>
-          <button onClick={() => openDeleteModal(row)} className="text-red-600">🗑️</button>
-        </div>
-      )
+      sortable: false,
+      render: (_, row) => handleEdit
     }
   ];
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen bg-gray-50">
       <div className={`hidden md:block transition-all duration-300 ${isSidebarCollapsed ? 'md:w-16' : 'md:w-64'}`}>
         <Sidebar isCollapsed={isSidebarCollapsed} toggleSidebar={toggleSidebar} />
       </div>
@@ -78,7 +127,7 @@ export default function DashboardPage() {
         {/* Cards de Resumo */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {/* Card Total de Projetos */}
-          <div className="bg-white rounded-lg shadow p-6 border border-gray-100">
+          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">Total de Projetos</p>
@@ -93,7 +142,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Card Projetos Concluídos */}
-          <div className="bg-white rounded-lg shadow p-6 border border-gray-100">
+          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">Concluídos</p>
@@ -108,7 +157,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Card Projetos em Andamento */}
-          <div className="bg-white rounded-lg shadow p-6 border border-gray-100">
+          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">Em Andamento</p>
@@ -123,7 +172,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Card Projetos Pendentes */}
-          <div className="bg-white rounded-lg shadow p-6 border border-gray-100">
+          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500">Pendentes</p>
@@ -139,7 +188,12 @@ export default function DashboardPage() {
         </div>
 
         {/* Tabela */}
-        <Table title="Projetos" columns={columns} data={projects} />
+        <Table 
+          title="Gerenciamento de Projetos" 
+          columns={columns} 
+          data={projects}
+          striped={true}
+        />
 
         {/* Modal de edição */}
         <ModalEditProject
