@@ -1,15 +1,10 @@
+// src/services/api/userService.js
+import axios from 'axios';
 
+const api = axios.create({
+  baseURL: 'https://localhost:7118/api'  // <— usa HTTPS
+});
 
-
-// src/services/authService.js
-import axios from '@/utils/axiosInstance';
-
-export const login = async (email, password) => {
-  try {
-    const response = await axios.post('/auth/login', { email, password });
-    return response; // retornando o objeto completo
-  } catch (error) {
-    return error.response; // ainda retorna a resposta para tratar status != 200
-  }
-};
-
+export function getUsers() {
+  return api.get('/Users');
+}

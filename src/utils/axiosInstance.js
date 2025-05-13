@@ -1,10 +1,9 @@
+// src/utils/axiosInstance.js
 import axios from 'axios';
 
-const instance = axios.create({
-  baseURL: 'http://localhost:5000/api', // ajuste conforme seu backend
-  headers: {
-    'Content-Type': 'application/json',
-  },
+const axiosInstance = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  // você pode adicionar headers, interceptors aqui
 });
 
-export default instance;
+export default axiosInstance;
