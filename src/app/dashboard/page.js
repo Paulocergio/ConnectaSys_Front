@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Sidebar from '../../components/Sidebar';
 import Table from '../../components/Table';
 import ModalEditProject from '../../components/Modals/ModalEditProject';   
-import ModalConfirmDelete from '../../components/modals/ModalConfirmDelete';
+//import ModalConfirmDelete from '../../components/modals/ModalConfirmDelete';
 import { Edit, Trash2 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -204,12 +204,15 @@ export default function DashboardPage() {
         />
 
         {/* Modal de confirmação de exclusão */}
-        <ModalConfirmDelete
+    {/* <ModalConfirmDelete
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirm={confirmDelete}
           itemName={projectToDelete?.name}
-        />
+        /> */}
+
+        
+        
       </div>
     </div>
   );
