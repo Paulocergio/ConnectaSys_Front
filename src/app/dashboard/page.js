@@ -2,44 +2,44 @@
 import { useState } from 'react';
 import Sidebar from '../../components/Sidebar';
 import Table from '../../components/Table';
-import ModalEditProject from '../../components/Modals/ModalEditProject';   
+import ModalEditProject from '../../components/Modals/ModalEditGeneric';
 //import ModalConfirmDelete from '../../components/modals/ModalConfirmDelete';
 import { Edit, Trash2 } from 'lucide-react';
 
 export default function DashboardPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [projects, setProjects] = useState([
-    { 
-      id: 1, 
-      name: 'Website Redesign', 
-      status: 'Em andamento', 
+    {
+      id: 1,
+      name: 'Website Redesign',
+      status: 'Em andamento',
       progress: '75%',
       client: 'Empresa XYZ',
       priority: 'Alta',
       category: 'Design'
     },
-    { 
-      id: 2, 
-      name: 'App Mobile', 
-      status: 'Em andamento', 
+    {
+      id: 2,
+      name: 'App Mobile',
+      status: 'Em andamento',
       progress: '40%',
       client: 'Startup ABC',
       priority: 'Média',
       category: 'Desenvolvimento'
     },
-    { 
-      id: 3, 
-      name: 'Campanha Marketing', 
-      status: 'Concluído', 
+    {
+      id: 3,
+      name: 'Campanha Marketing',
+      status: 'Concluído',
       progress: '100%',
       client: 'Loja Virtual',
       priority: 'Baixa',
       category: 'Marketing'
     },
-    { 
-      id: 4, 
-      name: 'Sistema ERP', 
-      status: 'Pendente', 
+    {
+      id: 4,
+      name: 'Sistema ERP',
+      status: 'Pendente',
       progress: '10%',
       client: 'Indústria MNO',
       priority: 'Alta',
@@ -70,7 +70,7 @@ export default function DashboardPage() {
     setProjectToDelete(row);
     setIsDeleteModalOpen(true);
   };
-  
+
   const confirmDelete = () => {
     if (projectToDelete) {
       setProjects(prev => prev.filter(p => p.id !== projectToDelete.id));
@@ -86,35 +86,31 @@ export default function DashboardPage() {
   };
 
   const columns = [
-    { 
-      title: 'Nome', 
-      key: 'name', 
+    {
+      title: 'Nome',
+      key: 'name',
       sortable: true,
       filterable: true
-    },
-    { 
-      title: 'Cliente', 
-      key: 'client', 
-      sortable: true,
-      filterable: true
-    },
-    { 
-      title: 'Status', 
-      key: 'status', 
-      sortable: true,
-      filterable: true
-    },
-    { 
-      title: 'Progresso', 
-      key: 'progress', 
-      sortable: true 
     },
     {
-      title: 'Ações',
-      key: 'actions',
-      sortable: false,
-      render: (_, row) => handleEdit
-    }
+      title: 'Cliente',
+      key: 'client',
+      sortable: true,
+      filterable: true
+    },
+    {
+      title: 'Status',
+      key: 'status',
+      sortable: true,
+      filterable: true
+    },
+    {
+      title: 'Progresso',
+      key: 'progress',
+      sortable: true
+    },
+    
+
   ];
 
   return (
@@ -122,7 +118,7 @@ export default function DashboardPage() {
       <div className={`hidden md:block transition-all duration-300 ${isSidebarCollapsed ? 'md:w-16' : 'md:w-64'}`}>
         <Sidebar isCollapsed={isSidebarCollapsed} toggleSidebar={toggleSidebar} />
       </div>
-  
+
       <div className="flex-1 p-6">
         {/* Cards de Resumo */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -188,9 +184,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Tabela */}
-        <Table 
-          title="Gerenciamento de Projetos" 
-          columns={columns} 
+        <Table
+          title="Gerenciamento de Projetos"
+          columns={columns}
           data={projects}
           striped={true}
         />
@@ -204,15 +200,15 @@ export default function DashboardPage() {
         />
 
         {/* Modal de confirmação de exclusão */}
-    {/* <ModalConfirmDelete
+        {/* <ModalConfirmDelete
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirm={confirmDelete}
           itemName={projectToDelete?.name}
         /> */}
 
-        
-        
+
+
       </div>
     </div>
   );

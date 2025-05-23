@@ -7,10 +7,30 @@ import Table from '../../components/Table/Table';
 import { Eye, Edit, Trash2 } from 'lucide-react';
 import { Users } from 'lucide-react';
 
+
+import ModalEditGeneric from '../../components/Modals/ModalEditGeneric';
+
+
 export default function UsersPage() {
+
+
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [collapsed, setCollapsed] = useState(true);
+
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+
+ const handleEditClick = (user) => {
+  const normalized = {
+    ...user,
+    phoneNumber: user.phone ?? '',
+    password: '', // não mostrar senha real
+  };
+  setSelectedItem(normalized);
+  setIsModalOpen(true);
+};
 
   useEffect(() => {
     getUsers()
@@ -96,7 +116,13 @@ export default function UsersPage() {
       sortable: false,
       render: (_, user) => (
         <div className="flex items-center gap-3">
-          <button title="Editar" className="text-slate-500 hover:text-blue-600"><Edit size={16} /></button>
+          <button
+            title="Editar"
+            className="text-slate-500 hover:text-blue-600"
+            onClick={() => handleEditClick(user)}
+          >
+            <Edit size={16} />
+          </button>
           <button title="Excluir" className="text-slate-500 hover:text-red-600"><Trash2 size={16} /></button>
         </div>
       )
@@ -118,14 +144,32 @@ export default function UsersPage() {
             <div className="flex items-center gap-2 text-xl font-semibold text-slate-800">
               <Users size={20} className="text-blue-600" />
               Usuários
+
             </div>
+
           }
           data={users}
           columns={columns}
+        
           striped
         />
 
       </main>
+      <ModalEditGeneric
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        item={selectedItem}
+        title="Editar Usuário"
+        onSave={(updatedUser) => {
+          setUsers(prev =>
+            prev.map(u => (u.id === updatedUser.id ? updatedUser : u))
+          );
+          setIsModalOpen(false);
+        }}
+      />
+
+
     </div>
+
   );
 }
