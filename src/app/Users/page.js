@@ -29,7 +29,7 @@ export default function UsersPage() {
   const handleEditClick = (user) => {
     const normalized = {
       ...user,
-      phoneNumber: user.phone ?? '',
+     
       password: '',
     };
     setSelectedItem(normalized);
