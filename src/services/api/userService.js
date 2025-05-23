@@ -7,7 +7,6 @@ const api = axios.create({
 
 export async function getUsers() {
   const response = await api.get('/Users');
-
   return {
     data: response.data.map(user => ({
       id: user.id,
@@ -20,4 +19,8 @@ export async function getUsers() {
       createdAt: user.createdAt,
     }))
   };
+}
+
+export async function deleteUser(id) {
+  return api.delete(`/Users/${id}`);
 }

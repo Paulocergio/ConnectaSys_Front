@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getUsers } from '../../services/api/userService';
+import { getUsers  ,deleteUser} from '../../services/api/userService';
 import Sidebar from '../../components/Sidebar';
 import Table from '../../components/Table/Table';
 import { Edit, Trash2 } from 'lucide-react';
@@ -36,17 +36,19 @@ export default function UsersPage() {
     setIsModalOpen(true);
   };
 
-  const confirmDelete = () => {
-    if (itemToDelete) {
+const confirmDelete = async () => {
+  if (itemToDelete) {
+    try {
+      await deleteUser(itemToDelete.id);
       setUsers(prev => prev.filter(u => u.id !== itemToDelete.id));
-      setIsDeleteModalOpen(false);
-      setToast({ message: 'Usuário excluído com sucesso.', type: 'success', id: Date.now() });
-
-    } else {
+      setToast({ message: 'Usuário excluído com sucesso.', type: 'success' });
+    } catch (error) {
       setToast({ message: 'Erro ao excluir usuário.', type: 'error' });
+    } finally {
+      setIsDeleteModalOpen(false);
     }
-  };
-
+  }
+};
 
   useEffect(() => {
     getUsers()
