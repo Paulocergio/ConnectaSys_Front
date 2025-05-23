@@ -4,16 +4,15 @@ import { useState, useEffect } from 'react';
 import { getUsers } from '../../services/api/userService';
 import Sidebar from '../../components/Sidebar';
 import Table from '../../components/Table/Table';
-import { Eye, Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import { Users } from 'lucide-react';
 
-
 import ModalEditGeneric from '../../components/Modals/ModalEditGeneric';
+import ModalConfirmDelete from '../../components/Modals/ModalConfirmDelete';
 
+import Toast from '../../components/Toast/Toast';
 
 export default function UsersPage() {
-
-
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [collapsed, setCollapsed] = useState(true);
@@ -21,16 +20,33 @@ export default function UsersPage() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
- const handleEditClick = (user) => {
-  const normalized = {
-    ...user,
-    phoneNumber: user.phone ?? '',
-    password: '', // não mostrar senha real
+  const [toast, setToast] = useState({ message: '', type: '' });
+
+
+  const handleEditClick = (user) => {
+    const normalized = {
+      ...user,
+      phoneNumber: user.phone ?? '',
+      password: '',
+    };
+    setSelectedItem(normalized);
+    setIsModalOpen(true);
   };
-  setSelectedItem(normalized);
-  setIsModalOpen(true);
-};
+
+  const confirmDelete = () => {
+    if (itemToDelete) {
+      setUsers(prev => prev.filter(u => u.id !== itemToDelete.id));
+      setIsDeleteModalOpen(false);
+      setToast({ message: 'Usuário excluído com sucesso.', type: 'success', id: Date.now() });
+
+    } else {
+      setToast({ message: 'Erro ao excluir usuário.', type: 'error' });
+    }
+  };
+
 
   useEffect(() => {
     getUsers()
@@ -42,7 +58,6 @@ export default function UsersPage() {
         });
         setUsers(sorted);
       })
-
       .finally(() => setLoading(false));
   }, []);
 
@@ -89,27 +104,15 @@ export default function UsersPage() {
       render: value => (
         value ? (
           <span className="inline-flex items-center gap-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-            <div className="bg-white rounded-full p-[2px] flex items-center justify-center">
-              <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" />
-              </svg>
-            </div>
             Ativo
           </span>
         ) : (
           <span className="inline-flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-            <div className="bg-white rounded-full p-[2px] flex items-center justify-center">
-              <svg className="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 7a1 1 0 112 0v2a1 1 0 11-2 0V7zm1 6a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
-              </svg>
-            </div>
             Inativo
           </span>
         )
       )
     },
-
-
     {
       key: 'actions',
       title: 'Ações',
@@ -123,12 +126,20 @@ export default function UsersPage() {
           >
             <Edit size={16} />
           </button>
-          <button title="Excluir" className="text-slate-500 hover:text-red-600"><Trash2 size={16} /></button>
+          <button
+            title="Excluir"
+            className="text-slate-500 hover:text-red-600"
+            onClick={() => {
+              setItemToDelete(user);
+              setIsDeleteModalOpen(true);
+            }}
+          >
+            <Trash2 size={16} />
+          </button>
         </div>
       )
     }
   ];
-
 
   if (loading) return <p>Carregando usuários…</p>;
 
@@ -144,17 +155,14 @@ export default function UsersPage() {
             <div className="flex items-center gap-2 text-xl font-semibold text-slate-800">
               <Users size={20} className="text-blue-600" />
               Usuários
-
             </div>
-
           }
           data={users}
           columns={columns}
-        
           striped
         />
-
       </main>
+
       <ModalEditGeneric
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -168,8 +176,25 @@ export default function UsersPage() {
         }}
       />
 
+      ...
+
+      <ModalConfirmDelete
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        itemName={itemToDelete?.firstName}
+      />
+
+     {toast.message && (
+  <Toast
+    key={toast.id}
+    message={toast.message}
+    type={toast.type}
+    onClose={() => setToast({ message: '', type: '', id: null })}
+  />
+)}
+
 
     </div>
-
   );
 }

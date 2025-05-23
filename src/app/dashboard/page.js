@@ -71,12 +71,13 @@ export default function DashboardPage() {
     setIsDeleteModalOpen(true);
   };
 
-  const confirmDelete = () => {
-    if (projectToDelete) {
-      setProjects(prev => prev.filter(p => p.id !== projectToDelete.id));
-      setIsDeleteModalOpen(false);
-    }
-  };
+const confirmDelete = () => {
+  if (itemToDelete) {
+    setUsers(prev => prev.filter(u => u.id !== itemToDelete.id));
+    setIsDeleteModalOpen(false);
+  }
+};
+
 
   const handleSaveEdit = (updatedProject) => {
     setProjects((prev) =>
