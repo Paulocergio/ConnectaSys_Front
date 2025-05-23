@@ -29,11 +29,10 @@ export async function updateUser(id, data) {
     firstName: data.firstName,
     lastName: data.lastName,
     email: data.email,
-    phone: data.phoneNumber,
+    phone: data.phone ?? '',
+    password: data.password, 
     isActive: data.isActive
   };
 
   return api.put(`/Users/${id}`, payload);
 }
-
-
