@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getUsers  ,deleteUser} from '../../services/api/userService';
+import { getUsers, deleteUser, updateUser } from '../../services/api/userService';
 import Sidebar from '../../components/Sidebar';
 import Table from '../../components/Table/Table';
 import { Edit, Trash2 } from 'lucide-react';
@@ -36,19 +36,19 @@ export default function UsersPage() {
     setIsModalOpen(true);
   };
 
-const confirmDelete = async () => {
-  if (itemToDelete) {
-    try {
-      await deleteUser(itemToDelete.id);
-      setUsers(prev => prev.filter(u => u.id !== itemToDelete.id));
-      setToast({ message: 'Usuário excluído com sucesso.', type: 'success' });
-    } catch (error) {
-      setToast({ message: 'Erro ao excluir usuário.', type: 'error' });
-    } finally {
-      setIsDeleteModalOpen(false);
+  const confirmDelete = async () => {
+    if (itemToDelete) {
+      try {
+        await deleteUser(itemToDelete.id);
+        setUsers(prev => prev.filter(u => u.id !== itemToDelete.id));
+        setToast({ message: 'Usuário excluído com sucesso.', type: 'success' });
+      } catch (error) {
+        setToast({ message: 'Erro ao excluir usuário.', type: 'error' });
+      } finally {
+        setIsDeleteModalOpen(false);
+      }
     }
-  }
-};
+  };
 
   useEffect(() => {
     getUsers()
@@ -170,11 +170,18 @@ const confirmDelete = async () => {
         onClose={() => setIsModalOpen(false)}
         item={selectedItem}
         title="Editar Usuário"
-        onSave={(updatedUser) => {
-          setUsers(prev =>
-            prev.map(u => (u.id === updatedUser.id ? updatedUser : u))
-          );
-          setIsModalOpen(false);
+        onSave={async (updatedUser) => {
+          try {
+            await updateUser(updatedUser.id, updatedUser);
+            setUsers(prev =>
+              prev.map(u => (u.id === updatedUser.id ? updatedUser : u))
+            );
+            setToast({ message: 'Usuário atualizado com sucesso.', type: 'success' });
+          } catch (error) {
+            setToast({ message: 'Erro ao atualizar usuário.', type: 'error' });
+          } finally {
+            setIsModalOpen(false);
+          }
         }}
       />
 
@@ -187,14 +194,14 @@ const confirmDelete = async () => {
         itemName={itemToDelete?.firstName}
       />
 
-     {toast.message && (
-  <Toast
-    key={toast.id}
-    message={toast.message}
-    type={toast.type}
-    onClose={() => setToast({ message: '', type: '', id: null })}
-  />
-)}
+      {toast.message && (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast({ message: '', type: '', id: null })}
+        />
+      )}
 
 
     </div>

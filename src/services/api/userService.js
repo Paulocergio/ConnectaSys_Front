@@ -15,7 +15,7 @@ export async function getUsers() {
       email: user.email,
       phoneNumber: user.phone ?? 'Não informado',
       isActive: user.isActive,
-      password: user.password,  
+      password: user.password,
       createdAt: user.createdAt,
     }))
   };
@@ -24,3 +24,16 @@ export async function getUsers() {
 export async function deleteUser(id) {
   return api.delete(`/Users/${id}`);
 }
+export async function updateUser(id, data) {
+  const payload = {
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phoneNumber,
+    isActive: data.isActive
+  };
+
+  return api.put(`/Users/${id}`, payload);
+}
+
+
