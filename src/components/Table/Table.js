@@ -75,7 +75,6 @@ export default function Table({
     <div className="w-full max-w-7xl mx-auto py-10 px-4">
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-          <span className="inline-block bg-blue-100 text-blue-600 p-2 rounded-full font-bold">👤</span>
           {title}
         </h2>
         <div className="relative w-full md:w-auto">
