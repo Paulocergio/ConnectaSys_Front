@@ -3,7 +3,7 @@
 import { Dialog } from '@headlessui/react';
 import { Trash2 } from 'lucide-react';
 
-export default function ModalConfirmDelete({ isOpen, onClose, onConfirm, itemName = 'este item' }) {
+export default function  ({ isOpen, onClose, onConfirm, itemName = 'este item' }) {
   if (!isOpen) return null;
 
   return (

@@ -28,35 +28,27 @@ export default function ModalEditGeneric({ isOpen, onClose, item = {}, onSave, t
     onClose();
   };
 
-  const formatPhone = (value) => {
-  const cleaned = value.replace(/\D/g, '');
-  if (cleaned.length <= 10) {
-    return cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3');
-  } else {
-    return cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, '($1) $2-$3');
-  }
-};
-
+ 
 
   const getFieldLabel = (key) => {
-  const translations = {
-    'name': 'Nome',
-    'email': 'Email',
-    'phoneNumber': 'Numero de Telefone', 
-    'password': 'Senha',
-    'isActive': 'Ativo',
-    'firstName': 'Primeiro Nome',
-    'lastName': 'Sobrenome',
-    'address': 'Endereço',
-    'city': 'Cidade',
-    'state': 'Estado',
-    'zipCode': 'CEP',
-    'birthDate': 'Data de Nascimento',
-    'role': 'Função'
-  };
+    const translations = {
+      'name': 'Nome',
+      'email': 'Email',
+      'phoneNumber': 'Numero de Telefone',
+      'password': 'Senha',
+      'isActive': 'Ativo',
+      'firstName': 'Primeiro Nome',
+      'lastName': 'Sobrenome',
+      'address': 'Endereço',
+      'city': 'Cidade',
+      'state': 'Estado',
+      'zipCode': 'CEP',
+      'birthDate': 'Data de Nascimento',
+      'role': 'Função'
+    };
 
-  return translations[key] || key.replace(/([A-Z])/g, ' $1').trim();
-};
+    return translations[key] || key.replace(/([A-Z])/g, ' $1').trim();
+  };
 
   const renderInput = (key, value, index, totalFields) => {
     if (typeof value === 'boolean') {
@@ -76,39 +68,6 @@ export default function ModalEditGeneric({ isOpen, onClose, item = {}, onSave, t
         </div>
       );
     }
-if (key === 'password') {
-  return (
-    <div key={key} className="space-y-2">
-      <label className="block text-sm font-semibold text-gray-700">
-        {getFieldLabel(key)}
-      </label>
-      <div className="relative">
-        <input
-          type={showPassword ? 'text' : 'password'}
-          name={key}
-          value={value ?? ''}
-          onChange={handleChange}
-          className="
-            w-full px-4 py-3 text-sm text-gray-900 placeholder-gray-500
-            bg-white border border-gray-300 rounded-xl
-            focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
-            hover:border-gray-400 transition-all duration-200
-            shadow-sm hover:shadow-md
-          "
-          placeholder={`Digite ${getFieldLabel(key).toLowerCase()}...`}
-        />
-        <button
-          type="button"
-          onClick={() => setShowPassword(prev => !prev)}
-          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-        >
-          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-        </button>
-      </div>
-    </div>
-  );
-}
-
     if (key === 'password') {
       return (
         <div key={key} className="space-y-2">
@@ -122,18 +81,18 @@ if (key === 'password') {
               value={value ?? ''}
               onChange={handleChange}
               className="
-              w-full px-4 py-3 text-sm text-gray-900 placeholder-gray-500
-              bg-white border border-gray-300 rounded-xl
-              focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
-              hover:border-gray-400 transition-all duration-200
-              shadow-sm hover:shadow-md
-            "
+            w-full px-4 py-3 text-sm text-gray-900 placeholder-gray-500
+            bg-white border border-gray-300 rounded-xl
+            focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
+            hover:border-gray-400 transition-all duration-200
+            shadow-sm hover:shadow-md
+          "
               placeholder={`Digite ${getFieldLabel(key).toLowerCase()}...`}
             />
             <button
               type="button"
               onClick={() => setShowPassword(prev => !prev)}
-              className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
@@ -162,7 +121,7 @@ if (key === 'password') {
         />
       </div>
     );
-  }; 
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

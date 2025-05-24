@@ -1,10 +1,7 @@
 'use client';
 
 import { useState, useEffect, Fragment } from 'react';
-import {
-  ChevronDown, ChevronUp, Search, X, ArrowUp, ArrowDown,
-  ChevronLeft, ChevronRight
-} from 'lucide-react';
+import { Plus, Search, X, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Users } from 'lucide-react';
 
 export default function Table({
   columns = [],
@@ -13,14 +10,16 @@ export default function Table({
   showHeader = true,
   emptyText = "Nenhum dado encontrado",
   loading = false,
-  onRowClick
+  onRowClick,
+  onAddClick,
+  children
 }) {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
   const [filterText, setFilterText] = useState('');
   const [filteredData, setFilteredData] = useState([...data]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10); // Início com 10 registros
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -73,31 +72,49 @@ export default function Table({
 
   return (
     <div className="w-full max-w-7xl mx-auto py-10 px-4">
-      <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="mb-6 flex items-start justify-between">
         <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+          <Users size={24} className="text-blue-600" />
           {title}
         </h2>
-        <div className="relative w-full md:w-auto">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search size={18} className="text-slate-400" />
+
+        <div className="flex flex-col gap-3">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search size={18} className="text-slate-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Buscar..."
+              value={filterText}
+              onChange={e => setFilterText(e.target.value)}
+              className="pl-10 pr-10 py-2.5 w-64 bg-white border border-slate-300 rounded-lg text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            {filterText && (
+              <button
+                onClick={() => setFilterText('')}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+              >
+                <X size={16} />
+              </button>
+            )}
           </div>
-          <input
-            type="text"
-            placeholder="Buscar..."
-            value={filterText}
-            onChange={e => setFilterText(e.target.value)}
-            className="pl-10 pr-10 py-2.5 w-full md:w-64 bg-white border border-slate-300 rounded-lg text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-          {filterText && (
-            <button
-              onClick={() => setFilterText('')}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
-            >
-              <X size={16} />
-            </button>
-          )}
+
+          <button
+            onClick={() => onAddClick && onAddClick()}
+            className="flex items-center gap-2 px-4 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors self-end"
+          >
+            <Plus size={16} />
+            Adicionar
+          </button>
         </div>
       </div>
+
+      {children && (
+        <div className="mb-4">
+          {children}
+        </div>
+      )}
 
       <div className="overflow-auto rounded-xl border border-slate-200 shadow-sm bg-white min-w-[900px]">
         <table className="min-w-full text-sm text-slate-700">
@@ -108,9 +125,8 @@ export default function Table({
                   <th
                     key={col.key}
                     onClick={() => col.sortable !== false && handleSort(col)}
-                    className={`px-4 py-4 text-left font-semibold text-xs uppercase tracking-wider ${
-                      col.sortable !== false ? 'cursor-pointer hover:text-slate-800' : ''
-                    }`}
+                    className={`px-4 py-4 text-left font-semibold text-xs uppercase tracking-wider ${col.sortable !== false ? 'cursor-pointer hover:text-slate-800' : ''
+                      }`}
                   >
                     <div className="flex items-center gap-1">
                       {col.title}
@@ -175,11 +191,10 @@ export default function Table({
             const pageNum = i + 1;
             return (
               <button key={pageNum} onClick={() => setCurrentPage(pageNum)}
-                className={`px-3 py-1 rounded font-medium transition ${
-                  currentPage === pageNum
-                    ? 'bg-blue-600 text-white'
-                    : 'text-blue-600 hover:bg-blue-100'
-                }`}
+                className={`px-3 py-1 rounded font-medium transition ${currentPage === pageNum
+                  ? 'bg-blue-600 text-white'
+                  : 'text-blue-600 hover:bg-blue-100'
+                  }`}
               >{pageNum}</button>
             );
           })}
