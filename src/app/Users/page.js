@@ -9,7 +9,7 @@ import ModalEditGeneric from '../../components/Modals/ModalEditGeneric';
 import ModalAddGeneric from '../../components/Modals/ModalAddGeneric';
 import ModalConfirmDelete from '../../components/Modals/ModalConfirmDelete';
 
-import { showSuccess, showError, ToastContainerWrapper } from '../../components/Toast/ToastNotification'; 
+import { showSuccess, showError, ToastContainerWrapper } from '../../components/Toast/ToastNotification';
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -187,7 +187,6 @@ export default function UsersPage() {
                     password: newData.password,
                     isActive: true
                   };
-
                   await createUser(payload);
                   const res = await getUsers();
                   const sorted = res.data.sort((a, b) => {
@@ -199,10 +198,14 @@ export default function UsersPage() {
                   setUsers(sorted);
                   showSuccess('USUÁRIO ADICIONADO COM SUCESSO');
                   setIsAddModalOpen(false);
+                  console.log('[ModalAddGeneric] Modal fechado após sucesso.');
                 } catch (error) {
-                  showError('ERRO AO ADICIONAR USUÁRIO');
+                  console.error('[ModalAddGeneric] Erro ao adicionar usuário:', error);
+                  const backendMessage = error?.response?.data?.error || 'Erro ao adicionar usuário.';
+                  showError(backendMessage);
                 }
               }}
+
               fields={[
                 { name: 'firstName', label: 'Nome' },
                 { name: 'lastName', label: 'Sobrenome' },
