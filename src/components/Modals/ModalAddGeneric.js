@@ -25,13 +25,28 @@ export default function ModalAddGeneric({
 
   if (!isOpen) return null;
 
-  const handleChange = e => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
+const handleChange = e => {
+  const { name, value, type, checked } = e.target;
+
+  let newValue = value;
+
+  if (name === 'phone') {
+    const cleaned = value.replace(/\D/g, '').slice(0, 11); // limita a 11 dígitos
+    if (cleaned.length <= 10) {
+  
+      newValue = cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3');
+    } else {
+     
+      newValue = cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, '($1) $2-$3');
+    }
+  }
+
+  setFormData(prev => ({
+    ...prev,
+    [name]: type === 'checkbox' ? checked : newValue
+  }));
+};
+
 
   const handleSubmit = e => {
     e.preventDefault();

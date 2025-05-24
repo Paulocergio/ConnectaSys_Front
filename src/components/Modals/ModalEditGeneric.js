@@ -14,19 +14,39 @@ export default function ModalEditGeneric({ isOpen, onClose, item = {}, onSave, t
 
   if (!isOpen) return null;
 
-  const handleChange = e => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
+
 
   const handleSubmit = e => {
     e.preventDefault();
     onSave(formData);
     onClose();
   };
+
+
+  const handleChange = e => {
+  const { name, value, type, checked } = e.target;
+ setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  let newValue = value;
+
+  if (name === 'phone') {
+    const cleaned = value.replace(/\D/g, '').slice(0, 11); // limita a 11 dígitos
+    if (cleaned.length <= 10) {
+      // Formato fixo: (99) 9999-9999
+      newValue = cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3');
+    } else {
+      // Formato celular: (99) 99999-9999
+      newValue = cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, '($1) $2-$3');
+    }
+  }
+
+  setFormData(prev => ({
+    ...prev,
+    [name]: type === 'checkbox' ? checked : newValue
+  }));
+};
 
  
 
@@ -37,7 +57,7 @@ export default function ModalEditGeneric({ isOpen, onClose, item = {}, onSave, t
       'phoneNumber': 'Numero de Telefone',
       'password': 'Senha',
       'isActive': 'Ativo',
-      'firstName': 'Primeiro Nome',
+      'firstName': ' Nome',
       'lastName': 'Sobrenome',
       'address': 'Endereço',
       'city': 'Cidade',

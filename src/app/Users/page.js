@@ -5,13 +5,11 @@ import { getUsers, deleteUser, updateUser, createUser } from '../../services/api
 import Sidebar from '../../components/Sidebar';
 import Table from '../../components/Table/Table';
 import { Edit, Trash2, Plus, Users } from 'lucide-react';
-
 import ModalEditGeneric from '../../components/Modals/ModalEditGeneric';
 import ModalAddGeneric from '../../components/Modals/ModalAddGeneric';
 import ModalConfirmDelete from '../../components/Modals/ModalConfirmDelete';
 
-
-import Toast from '../../components/Toast/Toast';
+import { showSuccess, showError, ToastContainerWrapper } from '../../components/Toast/ToastNotification'; 
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -20,12 +18,9 @@ export default function UsersPage() {
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
-
-  const [toast, setToast] = useState({ message: '', type: '' });
 
   const handleEditClick = (user) => {
     const normalized = {
@@ -41,9 +36,9 @@ export default function UsersPage() {
       try {
         await deleteUser(itemToDelete.id);
         setUsers(prev => prev.filter(u => u.id !== itemToDelete.id));
-        setToast({ message: 'Usuário excluído com sucesso.', type: 'success' });
+        showSuccess('EXCLUÍDO COM SUCESSO');
       } catch (error) {
-        setToast({ message: 'Erro ao excluir usuário.', type: 'error' });
+        showError('ERRO AO EXCLUIR USUÁRIO');
       } finally {
         setIsDeleteModalOpen(false);
       }
@@ -74,8 +69,12 @@ export default function UsersPage() {
             {`${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`}
           </div>
           <div>
-            <div className="font-semibold text-slate-800">{user.firstName} {user.lastName}</div>
-            <div className="text-xs text-slate-500">{user.email}</div>
+            <div className="font-semibold text-slate-800 uppercase">
+              {`${user.firstName} ${user.lastName}`.toUpperCase()}
+            </div>
+            <div className="text-xs text-slate-500 uppercase">
+              {user.email?.toUpperCase()}
+            </div>
           </div>
         </div>
       )
@@ -87,7 +86,7 @@ export default function UsersPage() {
       render: (_, user) => {
         const formatPhone = (phone) => {
           const cleaned = phone?.replace(/\D/g, '');
-          if (!cleaned) return 'Não informado';
+          if (!cleaned) return 'NÃO INFORMADO';
           if (cleaned.length <= 10) {
             return cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3');
           } else {
@@ -117,11 +116,11 @@ export default function UsersPage() {
       render: value => (
         value ? (
           <span className="inline-flex items-center gap-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-            Ativo
+            ATIVO
           </span>
         ) : (
           <span className="inline-flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-            Inativo
+            INATIVO
           </span>
         )
       )
@@ -169,59 +168,43 @@ export default function UsersPage() {
               Usuários
             </div>
           }
-
           data={users}
           columns={columns}
           striped
           onAddClick={() => setIsAddModalOpen(true)}
         >
-
           {isAddModalOpen && (
             <ModalAddGeneric
               isOpen={isAddModalOpen}
               onClose={() => setIsAddModalOpen(false)}
-           onSave={async (newData) => {
-  try {
-    const payload = {
-      firstName: newData.firstName,
-      lastName: newData.lastName,
-      email: newData.email,
-      phone: newData.phone,
-      password: newData.password,
-      isActive: true // sempre ativo no cadastro
-    };
+              onSave={async (newData) => {
+                try {
+                  const payload = {
+                    firstName: newData.firstName,
+                    lastName: newData.lastName,
+                    email: newData.email,
+                    phone: newData.phone,
+                    password: newData.password,
+                    isActive: true
+                  };
 
-    console.log('[ModalAddGeneric] Payload preparado para envio:', payload);
+                  await createUser(payload);
+                  const res = await getUsers();
+                  const sorted = res.data.sort((a, b) => {
+                    const nameA = `${a.firstName ?? ''} ${a.lastName ?? ''}`.toLowerCase();
+                    const nameB = `${b.firstName ?? ''} ${b.lastName ?? ''}`.toLowerCase();
+                    return nameA.localeCompare(nameB);
+                  });
 
-    await createUser(payload);
-
-    console.log('[ModalAddGeneric] Usuário criado no backend, agora recarregando lista.');
-
-    const res = await getUsers();
-    const sorted = res.data.sort((a, b) => {
-      const nameA = `${a.firstName ?? ''} ${a.lastName ?? ''}`.toLowerCase();
-      const nameB = `${b.firstName ?? ''} ${b.lastName ?? ''}`.toLowerCase();
-      return nameA.localeCompare(nameB);
-    });
-
-    setUsers(sorted);
-
-    console.log('[ModalAddGeneric] Lista recarregada e estado atualizado.');
-
-    setToast({ message: 'Usuário adicionado com sucesso.', type: 'success' });
-
-    setIsAddModalOpen(false);
-
-    console.log('[ModalAddGeneric] Modal fechado após sucesso.');
-  } catch (error) {
-    console.error('[ModalAddGeneric] Erro ao adicionar usuário:', error);
-    setToast({ message: 'Erro ao adicionar usuário.', type: 'error' });
-  }
-}}
-
-
+                  setUsers(sorted);
+                  showSuccess('USUÁRIO ADICIONADO COM SUCESSO');
+                  setIsAddModalOpen(false);
+                } catch (error) {
+                  showError('ERRO AO ADICIONAR USUÁRIO');
+                }
+              }}
               fields={[
-                { name: 'firstName', label: 'Primeiro Nome' },
+                { name: 'firstName', label: 'Nome' },
                 { name: 'lastName', label: 'Sobrenome' },
                 { name: 'email', label: 'Email' },
                 { name: 'phone', label: 'Telefone' },
@@ -229,10 +212,8 @@ export default function UsersPage() {
               ]}
               title="Adicionar Usuário"
             />
-
           )}
         </Table>
-
       </main>
 
       <ModalEditGeneric
@@ -248,29 +229,24 @@ export default function UsersPage() {
               email: newData.email,
               phone: newData.phone,
               password: newData.password,
-              isActive: true // fixo no create
+              isActive: newData.isActive
             };
 
-            console.log('[ModalAddGeneric] Payload preparado para envio:', payload);
+            await updateUser(newData.id, payload);
+            const res = await getUsers();
+            const sorted = res.data.sort((a, b) => {
+              const nameA = `${a.firstName ?? ''} ${a.lastName ?? ''}`.toLowerCase();
+              const nameB = `${b.firstName ?? ''} ${b.lastName ?? ''}`.toLowerCase();
+              return nameA.localeCompare(nameB);
+            });
 
-            const response = await createUser(payload);
-
-            console.log('[ModalAddGeneric] Resposta do backend:', response.data);
-
-            const createdUser = response.data;
-
-            setUsers(prev => [...prev, createdUser]);
-
-            setToast({ message: 'Usuário adicionado com sucesso.', type: 'success' });
-
-            setIsAddModalOpen(false);
+            setUsers(sorted);
+            showSuccess('USUÁRIO ATUALIZADO COM SUCESSO');
+            setIsModalOpen(false);
           } catch (error) {
-            console.error('[ModalAddGeneric] Erro ao adicionar usuário:', error);
-            setToast({ message: 'Erro ao adicionar usuário.', type: 'error' });
+            showError('ERRO AO ATUALIZAR USUÁRIO');
           }
         }}
-
-
       />
 
       <ModalConfirmDelete
@@ -280,14 +256,7 @@ export default function UsersPage() {
         itemName={itemToDelete?.firstName}
       />
 
-      {toast.message && (
-        <Toast
-          key={toast.id}
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast({ message: '', type: '', id: null })}
-        />
-      )}
+      <ToastContainerWrapper />
     </div>
   );
 }

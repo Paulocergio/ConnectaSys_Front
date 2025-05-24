@@ -77,7 +77,7 @@ export default function Table({
           <Users size={24} className="text-blue-600" />
           {title}
         </h2>
-
+        
         <div className="flex flex-col gap-3">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -99,7 +99,7 @@ export default function Table({
               </button>
             )}
           </div>
-
+          
           <button
             onClick={() => onAddClick && onAddClick()}
             className="flex items-center gap-2 px-4 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors self-end"
@@ -146,7 +146,8 @@ export default function Table({
               </tr>
             </thead>
           )}
-          <tbody className="divide-y divide-slate-100">
+        <tbody>
+
             {loading ? (
               <tr><td colSpan={columns.length} className="text-center py-10">Carregando...</td></tr>
             ) : paginatedData.length === 0 ? (
@@ -192,8 +193,8 @@ export default function Table({
             return (
               <button key={pageNum} onClick={() => setCurrentPage(pageNum)}
                 className={`px-3 py-1 rounded font-medium transition ${currentPage === pageNum
-                  ? 'bg-blue-600 text-white'
-                  : 'text-blue-600 hover:bg-blue-100'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-blue-600 hover:bg-blue-100'
                   }`}
               >{pageNum}</button>
             );
