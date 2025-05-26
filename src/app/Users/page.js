@@ -192,11 +192,16 @@ export default function UsersPage() {
   if (loading) return <p>Carregando usuários…</p>;
 
   return (
+
+
+
+
+
     <div className="flex h-screen">
       <Sidebar isCollapsed={collapsed} toggleSidebar={() => setCollapsed((c) => !c)} />
       <main className="flex-1 p-6 bg-gray-50 overflow-auto">
         <Table
-          title={<div className="text-xl font-semibold text-slate-800">Usuários</div>}
+          title="Usuários"
           data={users}
           columns={columns}
           striped

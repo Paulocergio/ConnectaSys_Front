@@ -67,7 +67,7 @@ export default function CustomerPage() {
           data={customers}
           columns={columns}
           striped
-          onRowClick={(row) => alert(`Clicou em: ${row.firstName} ${row.lastName}`)}
+          onRowClick={(row) => console.log(`🔍 Clicou em: ${row.firstName} ${row.lastName}`)}
         />
       </main>
 
@@ -87,9 +87,9 @@ export default function CustomerPage() {
           address: 'Endereço',
           password: 'Senha',
           updatedAt: 'Atualizado em',
-          isActive: 'Ativo', 
+          isActive: 'Ativo',
         }}
-        checkboxLast={true} 
+        checkboxLast={true}
       />
     </div>
   );
