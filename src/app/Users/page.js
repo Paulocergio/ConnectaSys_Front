@@ -15,27 +15,69 @@ export default function UsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [collapsed, setCollapsed] = useState(true);
-
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [formData, setFormData] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
 
   const handleEditClick = (user) => {
-    const normalized = {
-      ...user,
-      password: '',
-    };
-    setSelectedItem(normalized);
+    setFormData({ ...user, password: '' });
     setIsModalOpen(true);
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    let newValue = value;
+
+    if (name === 'phone') {
+      const cleaned = value.replace(/\D/g, '').slice(0, 11);
+      if (cleaned.length <= 10) {
+        newValue = cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3');
+      } else {
+        newValue = cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, '($1) $2-$3');
+      }
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : newValue,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        isActive: formData.isActive,
+      };
+
+      await updateUser(formData.id, payload);
+      const res = await getUsers();
+      const sorted = res.data.sort((a, b) => {
+        const nameA = `${a.firstName ?? ''} ${a.lastName ?? ''}`.toLowerCase();
+        const nameB = `${b.firstName ?? ''} ${b.lastName ?? ''}`.toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+
+      setUsers(sorted);
+      showSuccess('USUÁRIO ATUALIZADO COM SUCESSO');
+      setIsModalOpen(false);
+    } catch (error) {
+      showError('ERRO AO ATUALIZAR USUÁRIO');
+    }
   };
 
   const confirmDelete = async () => {
     if (itemToDelete) {
       try {
         await deleteUser(itemToDelete.id);
-        setUsers(prev => prev.filter(u => u.id !== itemToDelete.id));
+        setUsers((prev) => prev.filter((u) => u.id !== itemToDelete.id));
         showSuccess('EXCLUÍDO COM SUCESSO');
       } catch (error) {
         showError('ERRO AO EXCLUIR USUÁRIO');
@@ -47,7 +89,7 @@ export default function UsersPage() {
 
   useEffect(() => {
     getUsers()
-      .then(res => {
+      .then((res) => {
         const sorted = res.data.sort((a, b) => {
           const nameA = `${a.firstName ?? ''} ${a.lastName ?? ''}`.toLowerCase();
           const nameB = `${b.firstName ?? ''} ${b.lastName ?? ''}`.toLowerCase();
@@ -77,43 +119,38 @@ export default function UsersPage() {
             </div>
           </div>
         </div>
-      )
+      ),
     },
     {
       key: 'phone',
       title: 'Telefone',
       sortable: false,
       render: (_, user) => {
-        const formatPhone = (phone) => {
-          const cleaned = phone?.replace(/\D/g, '');
-          if (!cleaned) return 'NÃO INFORMADO';
-          if (cleaned.length <= 10) {
-            return cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3');
-          } else {
-            return cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, '($1) $2-$3');
-          }
-        };
-        return formatPhone(user.phone);
-      }
+        const cleaned = user.phone?.replace(/\D/g, '');
+        if (!cleaned) return 'NÃO INFORMADO';
+        return cleaned.length <= 10
+          ? cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3')
+          : cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, '($1) $2-$3');
+      },
     },
     {
       key: 'createdAt',
       title: 'Criado em',
       sortable: true,
-      render: value =>
+      render: (value) =>
         new Date(value).toLocaleDateString('pt-BR', {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric',
           hour: '2-digit',
-          minute: '2-digit'
+          minute: '2-digit',
         }),
     },
     {
       key: 'isActive',
       title: 'Status',
       sortable: false,
-      render: value => (
+      render: (value) =>
         value ? (
           <span className="inline-flex items-center gap-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
             ATIVO
@@ -122,8 +159,7 @@ export default function UsersPage() {
           <span className="inline-flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
             INATIVO
           </span>
-        )
-      )
+        ),
     },
     {
       key: 'actions',
@@ -149,106 +185,79 @@ export default function UsersPage() {
             <Trash2 size={16} />
           </button>
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   if (loading) return <p>Carregando usuários…</p>;
 
   return (
     <div className="flex h-screen">
-      <Sidebar
-        isCollapsed={collapsed}
-        toggleSidebar={() => setCollapsed(c => !c)}
-      />
+      <Sidebar isCollapsed={collapsed} toggleSidebar={() => setCollapsed((c) => !c)} />
       <main className="flex-1 p-6 bg-gray-50 overflow-auto">
         <Table
-          title={
-            <div className="text-xl font-semibold text-slate-800">
-              Usuários
-            </div>
-          }
+          title={<div className="text-xl font-semibold text-slate-800">Usuários</div>}
           data={users}
           columns={columns}
           striped
           onAddClick={() => setIsAddModalOpen(true)}
-        >
-          {isAddModalOpen && (
-            <ModalAddGeneric
-              isOpen={isAddModalOpen}
-              onClose={() => setIsAddModalOpen(false)}
-              onSave={async (newData) => {
-                try {
-                  const payload = {
-                    firstName: newData.firstName,
-                    lastName: newData.lastName,
-                    email: newData.email,
-                    phone: newData.phone,
-                    password: newData.password,
-                    isActive: true
-                  };
-                  await createUser(payload);
-                  const res = await getUsers();
-                  const sorted = res.data.sort((a, b) => {
-                    const nameA = `${a.firstName ?? ''} ${a.lastName ?? ''}`.toLowerCase();
-                    const nameB = `${b.firstName ?? ''} ${b.lastName ?? ''}`.toLowerCase();
-                    return nameA.localeCompare(nameB);
-                  });
+        />
 
-                  setUsers(sorted);
-                  showSuccess('USUÁRIO ADICIONADO COM SUCESSO');
-                  setIsAddModalOpen(false);
-                  console.log('[ModalAddGeneric] Modal fechado após sucesso.');
-                } catch (error) {
-                  console.error('[ModalAddGeneric] Erro ao adicionar usuário:', error);
-                  const backendMessage = error?.response?.data?.error || 'Erro ao adicionar usuário.';
-                  showError(backendMessage);
-                }
-              }}
-
-              fields={[
-                { name: 'firstName', label: 'Nome' },
-                { name: 'lastName', label: 'Sobrenome' },
-                { name: 'email', label: 'Email' },
-                { name: 'phone', label: 'Telefone' },
-                { name: 'password', label: 'Senha', type: 'password' }
-              ]}
-              title="Adicionar Usuário"
-            />
-          )}
-        </Table>
+        {isAddModalOpen && (
+          <ModalAddGeneric
+            isOpen={isAddModalOpen}
+            onClose={() => setIsAddModalOpen(false)}
+            onSave={async (newData) => {
+              try {
+                const payload = {
+                  firstName: newData.firstName,
+                  lastName: newData.lastName,
+                  email: newData.email,
+                  phone: newData.phone,
+                  password: newData.password,
+                  isActive: true,
+                };
+                await createUser(payload);
+                const res = await getUsers();
+                const sorted = res.data.sort((a, b) => {
+                  const nameA = `${a.firstName ?? ''} ${a.lastName ?? ''}`.toLowerCase();
+                  const nameB = `${b.firstName ?? ''} ${b.lastName ?? ''}`.toLowerCase();
+                  return nameA.localeCompare(nameB);
+                });
+                setUsers(sorted);
+                showSuccess('USUÁRIO ADICIONADO COM SUCESSO');
+                setIsAddModalOpen(false);
+              } catch (error) {
+                const backendMessage = error?.response?.data?.error || 'Erro ao adicionar usuário.';
+                showError(backendMessage);
+              }
+            }}
+            fields={[
+              { name: 'firstName', label: 'Nome' },
+              { name: 'lastName', label: 'Sobrenome' },
+              { name: 'email', label: 'Email' },
+              { name: 'phone', label: 'Telefone' },
+              { name: 'password', label: 'Senha', type: 'password' },
+            ]}
+            title="Adicionar Usuário"
+          />
+        )}
       </main>
 
       <ModalEditGeneric
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        item={selectedItem}
+        formData={formData}
+        onChange={handleChange}
+        onSubmit={handleSubmit}
         title="Editar Usuário"
-        onSave={async (newData) => {
-          try {
-            const payload = {
-              firstName: newData.firstName,
-              lastName: newData.lastName,
-              email: newData.email,
-              phone: newData.phone,
-              password: newData.password,
-              isActive: newData.isActive
-            };
-
-            await updateUser(newData.id, payload);
-            const res = await getUsers();
-            const sorted = res.data.sort((a, b) => {
-              const nameA = `${a.firstName ?? ''} ${a.lastName ?? ''}`.toLowerCase();
-              const nameB = `${b.firstName ?? ''} ${b.lastName ?? ''}`.toLowerCase();
-              return nameA.localeCompare(nameB);
-            });
-
-            setUsers(sorted);
-            showSuccess('USUÁRIO ATUALIZADO COM SUCESSO');
-            setIsModalOpen(false);
-          } catch (error) {
-            showError('ERRO AO ATUALIZAR USUÁRIO');
-          }
+        labels={{
+          firstName: 'Nome',
+          lastName: 'Sobrenome',
+          email: 'Email',
+          phone: 'Telefone',
+          password: 'Senha',
+          isActive: 'Ativo',
         }}
       />
 
