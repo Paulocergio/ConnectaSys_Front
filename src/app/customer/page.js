@@ -2,11 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { Edit, Trash2 } from 'lucide-react';
-import { GetCustomer } from '../../services/api/customerService';
+
 import Table from '../../components/Table/Table';
 import Sidebar from '../../components/Sidebar';
 import ModalEditGeneric from '../../components/Modals/ModalEditGeneric';
 
+import { GetCustomer, deleteCustomer } from '../../services/api/customerService';
+
+
+import ConfirmDeleteModal from '../../components/Modals/ModalConfirmDelete';  
 export default function CustomerPage() {
   const [customers, setCustomers] = useState([]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
@@ -46,16 +50,100 @@ export default function CustomerPage() {
     console.log('✅ Dados salvos (simulado):', formData);
     setIsModalOpen(false);
   };
+const confirmDelete = async () => {
+  if (itemToDelete) {
+    try {
+      await deleteCustomer(itemToDelete.id);
+      setCustomers((prev) => prev.filter(c => c.id !== itemToDelete.id));
+      console.log(`✅ Cliente ${itemToDelete.firstName} excluído com sucesso`);
+    } catch (error) {
+      console.error('❌ Erro ao excluir cliente:', error);
+      alert('Erro ao excluir cliente. Tente novamente.');
+    } finally {
+      setIsDeleteModalOpen(false);
+    }
+  }
+};
 
   const columns = [
-    { key: 'name', title: 'Nome Completo', sortable: true, render: (_, c) => `${c.firstName} ${c.lastName}` },
-    { key: 'email', title: 'Email', sortable: true, render: (_, c) => c.email },
-    { key: 'phone', title: 'Telefone', sortable: false, render: (_, c) => c.phone || 'NÃO INFORMADO' },
-    { key: 'documentNumber', title: 'Documento', sortable: false, render: (_, c) => c.documentNumber || 'NÃO INFORMADO' },
-    { key: 'address', title: 'Endereço', sortable: false, render: (_, c) => c.address || 'NÃO INFORMADO' },
-    { key: 'createdAt', title: 'Criado em', sortable: true, render: (_, c) => new Date(c.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) },
-    { key: 'isActive', title: 'Status', sortable: false, render: (_, c) => c.isActive ? (<span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs">ATIVO</span>) : (<span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs">INATIVO</span>) },
-    { key: 'actions', title: 'Ações', sortable: false, render: (_, c) => (<div className="flex gap-3"><button onClick={() => handleEditClick(c)} className="text-blue-600"><Edit size={16} /></button><button onClick={() => { setItemToDelete(c); setIsDeleteModalOpen(true); }} className="text-red-600"><Trash2 size={16} /></button></div>) },
+    {
+      key: 'name',
+      title: 'Nome Completo',
+      sortable: true,
+      render: (_, c) => `${c.firstName} ${c.lastName}`
+    },
+    {
+      key: 'email',
+      title: 'Email',
+      sortable: true,
+      render: (_, c) => c.email
+    },
+    {
+      key: 'phone',
+      title: 'Telefone',
+      sortable: false,
+      render: (_, c) => c.phone || 'NÃO INFORMADO'
+    },
+    {
+      key: 'documentNumber',
+      title: 'Documento',
+      sortable: false,
+      render: (_, c) => c.documentNumber || 'NÃO INFORMADO'
+    },
+    {
+      key: 'address',
+      title: 'Endereço',
+      sortable: false,
+      render: (_, c) => c.address || 'NÃO INFORMADO'
+    },
+    {
+      key: 'createdAt',
+      title: 'Criado em',
+      sortable: true,
+      render: (_, c) =>
+        new Date(c.createdAt).toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+    },
+    {
+      key: 'isActive',
+      title: 'Status',
+      sortable: false,
+      render: (_, c) =>
+        c.isActive ? (
+          <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs">ATIVO</span>
+        ) : (
+          <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs">INATIVO</span>
+        )
+    },
+    {
+      key: 'actions',
+      title: 'Ações',
+      sortable: false,
+      render: (_, c) => (
+        <div className="flex gap-3">
+          <button
+            onClick={() => handleEditClick(c)}
+            className="text-blue-600"
+          >
+            <Edit size={16} />
+          </button>
+          <button
+            onClick={() => {
+              setItemToDelete(c);
+              setIsDeleteModalOpen(true);
+            }}
+            className="text-red-600"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      )
+    }
   ];
 
   return (
@@ -71,6 +159,15 @@ export default function CustomerPage() {
         />
       </main>
 
+      {/* Modal de Confirmação de Exclusão */}
+      <ConfirmDeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        itemName={`${itemToDelete?.firstName} ${itemToDelete?.lastName}`}
+      />
+
+      {/* Modal de Edição */}
       <ModalEditGeneric
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

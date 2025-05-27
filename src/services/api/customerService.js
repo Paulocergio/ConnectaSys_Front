@@ -25,3 +25,6 @@ export async function GetCustomer() {
   };
 }
 
+export async function deleteCustomer(id) {
+  return api.delete(`/Customers/${id}`);
+}
