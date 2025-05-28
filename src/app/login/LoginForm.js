@@ -19,7 +19,7 @@ export default function LoginForm() {
     try {
       const success = await login(form.email, form.password);
       if (success) {
-        router.push('/dashboard');
+        router.push('/customer');
       } else {
         alert('Usuário ou senha inválidos.');
       }
