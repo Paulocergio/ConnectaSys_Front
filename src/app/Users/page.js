@@ -78,7 +78,10 @@ export default function UsersPage() {
       try {
         await deleteUser(itemToDelete.id);
         setUsers((prev) => prev.filter((u) => u.id !== itemToDelete.id));
-        showSuccess('EXCLUÍDO COM SUCESSO');
+             showSuccess(` Usuario ${itemToDelete.firstName} excluído com sucesso`);
+
+
+        
       } catch (error) {
         showError('ERRO AO EXCLUIR USUÁRIO');
       } finally {

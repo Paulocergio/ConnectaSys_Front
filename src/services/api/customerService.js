@@ -5,6 +5,22 @@ const api = axios.create({
   baseURL: 'http://localhost:3000/api/v1',
 });
 
+export async function createCustomer(data) {
+  const payload = {
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone ?? '',
+    documentNumber: data.documentNumber ?? '',  // adicionando documento
+    address: data.address ?? '',                // adicionando endereço
+    password: data.password,
+    isActive: data.isActive,
+  };
+  return api.post(`/Customers`, payload);
+}
+
+
+
 export async function GetCustomer() {
   const response = await api.get('/Customers');
   return {

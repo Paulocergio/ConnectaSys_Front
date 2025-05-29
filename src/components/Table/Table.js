@@ -19,7 +19,7 @@ export default function Table({
   const [filterText, setFilterText] = useState('');
   const [filteredData, setFilteredData] = useState([...data]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(7);
   const [isMobile, setIsMobile] = useState(false);
   const [expandedRows, setExpandedRows] = useState(new Set());
 
@@ -230,7 +230,7 @@ export default function Table({
             >
               <Plus size={16} className="group-hover:rotate-90 transition-transform duration-200" />
               <span className="hidden xs:inline">Adicionar</span>
-              <span className="xs:hidden">Add</span>
+              <span className="xs:hidden">Adicionar</span>
             </button>
           </div>
         </div>
@@ -332,95 +332,77 @@ export default function Table({
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-6 lg:mt-8 flex flex-col space-y-4 lg:space-y-0 lg:flex-row lg:justify-between lg:items-center">
-          {/* Results Info */}
-          <div className="flex flex-col xs:flex-row xs:items-center gap-2 xs:gap-3 text-sm text-slate-600 order-2 lg:order-1">
-            <div className="flex items-center gap-2">
-              <span className="font-medium whitespace-nowrap">Mostrar</span>
-              <select
-                value={pageSize}
-                onChange={e => { setPageSize(parseInt(e.target.value)); setCurrentPage(1); }}
-                className="border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-blue-600 font-semibold bg-white shadow-sm transition-all duration-200 min-w-0"
-              >
-                {[5, 10, 15, 20, 25, 50].map(size => (
-                  <option key={size} value={size}>{size}</option>
-                ))}
-              </select>
-            </div>
-            <span className="font-medium whitespace-nowrap">
-              de <span className="text-blue-600 font-bold">{filteredData.length}</span> resultados
-            </span>
-          </div>
+   {/* Pagination */}
+{totalPages > 1 && (
+  <div className="mt-8 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+    
+    {/* Results Info */}
+    <div className="text-sm text-slate-600">
+      <span className="font-medium">Mostrar</span>{' '}
+      <select
+        value={pageSize}
+        onChange={(e) => {
+          setPageSize(parseInt(e.target.value));
+          setCurrentPage(1);
+        }}
+        className="ml-2 px-3 py-2 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+      >
+        {[5, 10, 15, 20, 25, 50].map((size) => (
+          <option key={size} value={size}>
+            {size}
+          </option>
+        ))}
+      </select>{' '}
+      de <span className="text-blue-600 font-bold">{filteredData.length}</span> resultados
+    </div>
 
-          {/* Pagination Controls */}
-          <div className="flex items-center justify-center gap-1 order-1 lg:order-2 overflow-x-auto pb-2 lg:pb-0">
-            <button 
-              onClick={() => setCurrentPage(1)} 
-              disabled={currentPage === 1}
-              className={`px-2 sm:px-3 py-2 rounded-lg font-medium transition-all duration-200 text-sm ${
-                currentPage === 1 
-                  ? 'text-slate-300 cursor-not-allowed' 
-                  : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50'
-              }`}
-            >
-              «
-            </button>
-            
-            <button 
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))} 
-              disabled={currentPage === 1}
-              className={`p-2 rounded-lg transition-all duration-200 ${
-                currentPage === 1 
-                  ? 'text-slate-300 cursor-not-allowed' 
-                  : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50'
-              }`}
-            >
-              <ChevronLeft size={16} />
-            </button>
+    {/* Pagination Controls */}
+    <div className="flex items-center gap-2 flex-wrap justify-center">
+     
+      <button
+        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+        disabled={currentPage === 1}
+        className={`px-3 py-2 rounded-full text-sm ${
+          currentPage === 1
+            ? 'text-slate-300 cursor-not-allowed'
+            : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50'
+        }`}
+      >
+        ‹
+      </button>
 
-            <div className="flex items-center gap-1 mx-1 sm:mx-2">
-              {getPaginationRange().map(pageNum => (
-                <button 
-                  key={pageNum} 
-                  onClick={() => setCurrentPage(pageNum)}
-                  className={`px-2 sm:px-3 lg:px-4 py-2 rounded-lg font-medium transition-all duration-200 text-sm min-w-[2rem] ${
-                    currentPage === pageNum
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg transform scale-105'
-                      : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50'
-                  }`}
-                >
-                  {pageNum}
-                </button>
-              ))}
-            </div>
+      {getPaginationRange().map((pageNum) => (
+        <button
+          key={pageNum}
+          onClick={() => setCurrentPage(pageNum)}
+          className={`px-4 py-2 rounded-full font-medium text-sm transition-all ${
+            currentPage === pageNum
+              ? 'bg-blue-600 text-white shadow-md transform scale-105'
+              : 'text-slate-600 hover:text-blue-600 hover:bg-blue-100'
+          }`}
+        >
+          {pageNum}
+        </button>
+      ))}
 
-            <button 
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} 
-              disabled={currentPage === totalPages}
-              className={`p-2 rounded-lg transition-all duration-200 ${
-                currentPage === totalPages 
-                  ? 'text-slate-300 cursor-not-allowed' 
-                  : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50'
-              }`}
-            >
-              <ChevronRight size={16} />
-            </button>
-            
-            <button 
-              onClick={() => setCurrentPage(totalPages)} 
-              disabled={currentPage === totalPages}
-              className={`px-2 sm:px-3 py-2 rounded-lg font-medium transition-all duration-200 text-sm ${
-                currentPage === totalPages 
-                  ? 'text-slate-300 cursor-not-allowed' 
-                  : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50'
-              }`}
-            >
-              »
-            </button>
-          </div>
-        </div>
-      )}
+      <button
+        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+        disabled={currentPage === totalPages}
+        className={`px-3 py-2 rounded-full text-sm ${
+          currentPage === totalPages
+            ? 'text-slate-300 cursor-not-allowed'
+            : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50'
+        }`}
+      >
+        ›
+      </button>
+
+      
+     
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
