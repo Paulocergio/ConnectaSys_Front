@@ -8,7 +8,7 @@ import Sidebar from '../../components/Sidebar';
 import ModalEditGeneric from '../../components/Modals/ModalEditGeneric';
 import ModalAddGeneric from '../../components/Modals/ModalAddGeneric';
 import ConfirmDeleteModal from '../../components/Modals/ModalConfirmDelete';
-import { GetCustomer, deleteCustomer, createCustomer } from '../../services/api/customerService';
+import { GetCustomer, deleteCustomer, createCustomer, updateCustomer } from '../../services/api/customerService';
 import { showSuccess, showError, ToastContainerWrapper } from '../../components/Toast/ToastNotification';
 
 export default function CustomerPage() {
@@ -36,6 +36,7 @@ export default function CustomerPage() {
     setIsModalOpen(true);
   };
 
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -45,10 +46,26 @@ export default function CustomerPage() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log('✅ Dados salvos (simulado):', formData);
+  e.preventDefault();
+  console.log('[UI] Submetendo dados do formulário:', formData);
+
+  try {
+    const { password, updatedAt, createdAt, deletedAt, ...sanitizedData } = formData;
+
+    console.log('[UI] Payload limpo antes do PUT:', sanitizedData);
+
+    await updateCustomer(formData.id, sanitizedData);
+    await fetchCustomers(); // Atualiza lista
+    showSuccess('Cliente atualizado com sucesso');
+  } catch (error) {
+    console.error('[UI] Erro ao atualizar cliente:', error.message);
+    showError(error.message);
+  } finally {
     setIsModalOpen(false);
-  };
+  }
+};
+
+
 
   const confirmDelete = async () => {
     if (itemToDelete) {
@@ -114,42 +131,46 @@ export default function CustomerPage() {
           onAddClick={() => setIsAddModalOpen(true)}
         />
 
-        {isAddModalOpen && (
-          <ModalAddGeneric
-            isOpen={isAddModalOpen}
-            onClose={() => setIsAddModalOpen(false)}
-            onSave={async (newData) => {
-              try {
-                const payload = {
-                  firstName: newData.firstName,
-                  lastName: newData.lastName,
-                  email: newData.email,
-                  phone: newData.phone,
-                  password: newData.password,
-                  isActive: true,
-                };
-                await createCustomer(payload);
-                await fetchCustomers();
-                showSuccess('CLIENTE ADICIONADO COM SUCESSO');
-                setIsAddModalOpen(false);
-              } catch (error) {
-                const backendMessage = error?.response?.data?.error || 'Erro ao adicionar cliente.';
-                showError(backendMessage);
-              }
-            }}
-            fields={[
-              { name: 'firstName', label: 'Nome' },
-              { name: 'lastName', label: 'Sobrenome' },
-              { name: 'email', label: 'Email' },
-              { name: 'phone', label: 'Telefone' },
-              { name: 'documentNumber', label: 'Documento' }, // NOVO
-              { name: 'address', label: 'Endereço' },         // NOVO
-              { name: 'password', label: 'Senha', type: 'password' },
-            ]}
+        {isAddModalOpen && (() => {
+          const allFields = [
+            { name: 'firstName', label: 'Nome' },
+            { name: 'lastName', label: 'Sobrenome' },
+            { name: 'documentNumber', label: 'Documento' },
+            { name: 'address', label: 'Endereço' },
+            { name: 'email', label: 'Email' },
+            { name: 'phone', label: 'Telefone' },
 
-            title="Adicionar Cliente"
-          />
-        )}
+          ];
+
+          return (
+            <ModalAddGeneric
+              isOpen={isAddModalOpen}
+              onClose={() => setIsAddModalOpen(false)}
+              onSave={async (newData) => {
+                try {
+                  const payload = {
+                    firstName: newData.firstName,
+                    lastName: newData.lastName,
+                    email: newData.email,
+                    phone: newData.phone,
+                   
+                    isActive: true,
+                  };
+                  await createCustomer(payload);
+                  await fetchCustomers();
+                  showSuccess('CLIENTE ADICIONADO COM SUCESSO');
+                  setIsAddModalOpen(false);
+                } catch (error) {
+                  const backendMessage = error?.response?.data?.error || 'Erro ao adicionar cliente.';
+                  showError(backendMessage);
+                }
+              }}
+              fields={allFields}
+              title="Adicionar Cliente"
+            />
+          );
+        })()}
+
       </main>
 
       <ConfirmDeleteModal
@@ -173,8 +194,6 @@ export default function CustomerPage() {
           email: 'Email',
           phone: 'Telefone',
           address: 'Endereço',
-          password: 'Senha',
-          updatedAt: 'Atualizado em',
           isActive: 'Ativo',
         }}
         checkboxLast={true}
