@@ -1,17 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, User, Mail, Phone, Calendar, Lock } from 'lucide-react';
 
 export default function ModalAddGeneric({
   isOpen,
   onClose,
   onSave,
   fields = [],
-  title = 'Adicionar'
+  title = 'Cadastro de Usuário'
 }) {
   const [formData, setFormData] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -30,13 +31,11 @@ export default function ModalAddGeneric({
 
     let newValue = value;
 
-    if (name === 'phone') {
+    if (name === 'telefone') {
       const cleaned = value.replace(/\D/g, '').slice(0, 11);
-      if (cleaned.length <= 10) {
-        newValue = cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3');
-      } else {
-        newValue = cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, '($1) $2-$3');
-      }
+      newValue = cleaned.length <= 10
+        ? cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3')
+        : cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, '($1) $2-$3');
     }
 
     setFormData(prev => ({
@@ -51,263 +50,150 @@ export default function ModalAddGeneric({
     onClose();
   };
 
-  const regularFields = fields.filter(f => f.name !== 'isActive' && f.type !== 'checkbox');
-  const checkboxFields = fields.filter(f => f.name === 'isActive' || f.type === 'checkbox');
-
-  const renderInput = (field) => {
-    const value = formData[field.name] || '';
-
-    return (
-      <div key={field.name} className="group relative">
-        <label className="block text-sm font-semibold text-slate-700 mb-1.5 
-                          tracking-wide uppercase text-xs">
-          {field.label}
-          {field.required && <span className="text-red-500 ml-1">*</span>}
-        </label>
-        <div className="relative">
-          {field.type === 'password' ? (
-            <>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                name={field.name}
-                value={value}
-                onChange={handleChange}
-                placeholder={field.placeholder || `Digite ${field.label.toLowerCase()}...`}
-                required={field.required}
-                className="w-full px-3 py-2 bg-white/80 backdrop-blur-sm
-                           border border-slate-200/60 rounded-lg
-                           focus:bg-white focus:border-violet-400/60 focus:ring-2 focus:ring-violet-400/10
-                           transition-all duration-300 ease-out
-                           text-slate-800 placeholder:text-slate-400
-                           shadow-sm hover:shadow-md focus:shadow-lg
-                           group-hover:border-slate-300/60 text-sm max-w-[200px]"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(prev => !prev)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-violet-600 transition-colors p-1"
-              >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </>
-          ) : field.type === 'textarea' ? (
-            <textarea
-              name={field.name}
-              value={value}
-              onChange={handleChange}
-              placeholder={field.placeholder || `Digite ${field.label.toLowerCase()}...`}
-              required={field.required}
-              rows={3}
-              className="w-full px-3 py-2 bg-white/80 backdrop-blur-sm
-                         border border-slate-200/60 rounded-lg
-                         focus:bg-white focus:border-violet-400/60 focus:ring-2 focus:ring-violet-400/10
-                         transition-all duration-300 ease-out
-                         text-slate-800 placeholder:text-slate-400
-                         shadow-sm hover:shadow-md focus:shadow-lg
-                         group-hover:border-slate-300/60 text-sm resize-none max-w-[200px]"
-            />
-          ) : field.type === 'select' ? (
-            <select
-              name={field.name}
-              value={value}
-              onChange={handleChange}
-              required={field.required}
-              className="w-full px-3 py-2 bg-white/80 backdrop-blur-sm
-                         border border-slate-200/60 rounded-lg
-                         focus:bg-white focus:border-violet-400/60 focus:ring-2 focus:ring-violet-400/10
-                         transition-all duration-300 ease-out
-                         text-slate-800
-                         shadow-sm hover:shadow-md focus:shadow-lg
-                         group-hover:border-slate-300/60 text-sm max-w-[200px]"
-            >
-              <option value="">Selecione...</option>
-              {field.options?.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <input
-              type={field.type || 'text'}
-              name={field.name}
-              value={value}
-              onChange={handleChange}
-              placeholder={field.placeholder || `Digite ${field.label.toLowerCase()}...`}
-              required={field.required}
-              className="w-full px-3 py-2 bg-white/80 backdrop-blur-sm
-                         border border-slate-200/60 rounded-lg
-                         focus:bg-white focus:border-violet-400/60 focus:ring-2 focus:ring-violet-400/10
-                         transition-all duration-300 ease-out
-                         text-slate-800 placeholder:text-slate-400
-                         shadow-sm hover:shadow-md focus:shadow-lg
-                         group-hover:border-slate-300/60 text-sm max-w-[200px]"
-            />
-          )}
-          <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-violet-400/5 to-blue-400/5 
-                          opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-        </div>
-      </div>
-    );
-  };
-
-  const renderCheckbox = (field) => (
-    <div key={field.name} className="group relative">
-      <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gradient-to-r 
-                      hover:from-violet-50/50 hover:to-blue-50/50 transition-all duration-300">
-        <div className="relative">
-          <input
-            type="checkbox"
-            name={field.name}
-            checked={formData[field.name] || false}
-            onChange={handleChange}
-            className="h-4 w-4 text-violet-600 bg-white border-2 border-slate-300 rounded-md
-                       focus:ring-2 focus:ring-violet-400/20 transition-all duration-200
-                       checked:border-violet-500 checked:bg-violet-500"
-            id={`checkbox-${field.name}`}
-          />
-          {formData[field.name] && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </div>
-          )}
-        </div>
-        <label
-          htmlFor={`checkbox-${field.name}`}
-          className="text-sm font-medium text-slate-700 cursor-pointer select-none
-                     group-hover:text-slate-800 transition-colors"
-        >
-          {field.label || 'Ativo'}
-        </label>
-      </div>
-    </div>
-  );
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop Premium */}
-      <div
-        className="absolute inset-0 bg-gradient-to-br from-slate-900/40 via-violet-900/20 to-blue-900/40 
-                   backdrop-blur-md transition-all duration-500"
-        onClick={onClose}
-      />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+      <div className="relative bg-white w-full max-w-2xl rounded-2xl shadow-xl p-8">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <User className="w-8 h-8 text-white" />
+            </div>
+            <p className="text-gray-600">
+              Preencha os dados abaixo para criar sua conta.
+            </p>
+          </div>
 
-      {/* Modal Container - Compacto e Centralizado */}
-      <div className="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl 
-                      w-full max-w-md mx-auto
-                      border border-white/40 shadow-violet-500/10
-                      transform transition-all duration-500 ease-out scale-100">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="flex items-center gap-2 mb-2 text-sm font-medium text-gray-700">
+                <User className="w-4 h-4" />
+                Nome completo *
+              </label>
+              <input
+                name="nome"
+                value={formData.nome || ''}
+                onChange={handleChange}
+                placeholder="Digite seu nome completo"
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-violet-50/30 via-transparent to-blue-50/30 pointer-events-none" />
+            <div>
+              <label className="flex items-center gap-2 mb-2 text-sm font-medium text-gray-700">
+                <Mail className="w-4 h-4" />
+                Email *
+              </label>
+              <input
+                name="email"
+                type="email"
+                value={formData.email || ''}
+                onChange={handleChange}
+                placeholder="seu@email.com"
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-        {/* Header Compacto */}
-        <div className="relative px-5 py-3 border-b border-slate-200/50">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {/* Ícone Premium */}
+            <div>
+              <label className="flex items-center gap-2 mb-2 text-sm font-medium text-gray-700">
+                <Phone className="w-4 h-4" />
+                Telefone
+              </label>
+              <input
+                name="telefone"
+                value={formData.telefone || ''}
+                onChange={handleChange}
+                placeholder="(11) 99999-9999"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 mb-2 text-sm font-medium text-gray-700">
+                <Calendar className="w-4 h-4" />
+                Data de Nascimento
+              </label>
+              <input
+                name="dataNascimento"
+                type="date"
+                value={formData.dataNascimento || ''}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 mb-2 text-sm font-medium text-gray-700">
+                <Lock className="w-4 h-4" />
+                Senha *
+              </label>
               <div className="relative">
-                <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-blue-600 rounded-lg 
-                                flex items-center justify-center shadow-md shadow-violet-500/25
-                                hover:shadow-lg hover:shadow-violet-500/30 transition-all duration-300">
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </div>
-                <div className="absolute -inset-1 bg-gradient-to-br from-violet-400 to-blue-500 rounded-lg opacity-20 blur-sm" />
-              </div>
-
-              {/* Título Elegante */}
-              <div>
-                <h2 className="text-lg font-bold bg-gradient-to-r from-slate-800 to-slate-600 
-                               bg-clip-text text-transparent">
-                  {title}
-                </h2>
-                <p className="text-xs text-slate-500">Preencha os campos</p>
+                <input
+                  name="senha"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.senha || ''}
+                  onChange={handleChange}
+                  placeholder="Mínimo 6 caracteres"
+                  required
+                  minLength={6}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
-            {/* Botão Fechar Premium */}
-            <button
-              onClick={onClose}
-              className="group p-1.5 hover:bg-slate-100/60 rounded-lg transition-all duration-300
-                         hover:rotate-90 transform"
-            >
-              <svg className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors"
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            <div>
+              <label className="flex items-center gap-2 mb-2 text-sm font-medium text-gray-700">
+                <Lock className="w-4 h-4" />
+                Confirmar Senha *
+              </label>
+              <div className="relative">
+                <input
+                  name="confirmarSenha"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={formData.confirmarSenha || ''}
+                  onChange={handleChange}
+                  placeholder="Confirme sua senha"
+                  required
+                  minLength={6}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Conteúdo Compacto */}
-        <div className="relative px-5 py-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <p className="text-xs text-gray-500 mt-2">* Campos obrigatórios</p>
 
-            {/* Grid de Inputs em 2 Colunas Compacto */}
-            {regularFields.length > 0 && (
-              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                {regularFields.map(field => renderInput(field))}
-              </div>
-            )}
-
-            {/* Seção de Checkboxes Compacta */}
-            {checkboxFields.length > 0 && (
-              <div className="pt-2">
-                <h3 className="text-sm font-semibold text-slate-700 mb-2 
-                               tracking-wide uppercase text-xs">
-                  Configurações
-                </h3>
-                <div className="grid grid-cols-2 gap-1">
-                  {checkboxFields.map(field => renderCheckbox(field))}
-                </div>
-              </div>
-            )}
-
-          </form>
-        </div>
-
-        {/* Footer Compacto */}
-        <div className="relative px-5 py-3 bg-gradient-to-r from-slate-50/80 to-slate-100/40 
-                        border-t border-slate-200/50 backdrop-blur-sm">
-          <div className="flex justify-end gap-2">
-            {/* Botão Cancelar */}
+          <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-slate-600 font-semibold rounded-lg
-                         hover:bg-white/60 border border-slate-200/60
-                         transition-all duration-300 ease-out
-                         hover:shadow-md hover:scale-105 active:scale-95 text-sm"
+              className="flex-1 border border-gray-300 rounded-lg py-2 text-gray-700 hover:bg-gray-100"
             >
               Cancelar
             </button>
-
-            {/* Botão Salvar Premium */}
             <button
               type="submit"
-              onClick={handleSubmit}
-              className="relative px-5 py-2 bg-gradient-to-r from-violet-600 to-blue-600 
-                         text-white font-semibold rounded-lg shadow-md shadow-violet-500/25
-                         hover:from-violet-700 hover:to-blue-700 hover:shadow-lg hover:shadow-violet-500/30
-                         transition-all duration-300 ease-out
-                         hover:scale-105 active:scale-95
-                         border border-violet-500/20 text-sm"
+              className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all"
             >
-              <span className="relative z-10">Salvar</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent 
-                              rounded-lg opacity-0 hover:opacity-100 transition-opacity duration-300" />
+              Cadastrar Usuário
             </button>
           </div>
-        </div>
-
-        {/* Efeitos de Luz */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-1 
-                        bg-gradient-to-r from-transparent via-violet-400/50 to-transparent blur-sm" />
+        </form>
       </div>
     </div>
   );
