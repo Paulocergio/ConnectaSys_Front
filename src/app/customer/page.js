@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -15,7 +14,7 @@ export default function CustomerPage() {
   const [customers, setCustomers] = useState([]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false); // <-- ADICIONADO AQUI
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [formData, setFormData] = useState({});
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
@@ -27,20 +26,11 @@ export default function CustomerPage() {
     setCustomers(res.data);
   };
 
-
-
-
   useEffect(() => {
     fetchCustomers();
-    if (isModalOpen) {
-      console.log('🟢 [Modal] Modal de edição aberto com dados:', formData);
-    }
   }, [isModalOpen]);
 
-
   const handleEditClick = (customer) => {
-    console.log('[Editar] Cliente recebido:', customer);
-
     const {
       createdAt,
       updatedAt,
@@ -48,18 +38,10 @@ export default function CustomerPage() {
       password,
       ...cleaned
     } = customer;
-
-    // Mantém o ID no objeto final
     const cleanedWithId = { ...cleaned, id: customer.id };
-
-    console.log('[Editar] Cliente com campos limpos (sem metadados):', cleanedWithId);
-
     setFormData(cleanedWithId);
     setIsModalOpen(true);
   };
-
-
-
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -71,25 +53,17 @@ export default function CustomerPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('[UI] Submetendo dados do formulário:', formData);
-
     try {
       const { password, updatedAt, createdAt, ...sanitizedData } = formData;
-
-      console.log('[UI] Payload limpo antes do PUT:', sanitizedData);
-
       await updateCustomer(formData.id, sanitizedData);
-      await fetchCustomers(); // Atualiza lista
+      await fetchCustomers();
       showSuccess('Cliente atualizado com sucesso');
     } catch (error) {
-      console.error('[UI] Erro ao atualizar cliente:', error.message);
       showError(error.message);
     } finally {
       setIsModalOpen(false);
     }
   };
-
-  //
 
   const confirmDelete = async () => {
     if (itemToDelete) {
@@ -163,7 +137,6 @@ export default function CustomerPage() {
             { name: 'address', label: 'Endereço' },
             { name: 'email', label: 'Email' },
             { name: 'phone', label: 'Telefone' },
-
           ];
 
           return (
@@ -177,7 +150,8 @@ export default function CustomerPage() {
                     lastName: newData.lastName,
                     email: newData.email,
                     phone: newData.phone,
-
+                    documentNumber: newData.documentNumber,
+                    address: newData.address,
                     isActive: true,
                   };
                   await createCustomer(payload);
@@ -231,8 +205,6 @@ export default function CustomerPage() {
         ]}
         checkboxLast={true}
       />
-
-
 
       <ToastContainerWrapper />
     </div>
