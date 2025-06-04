@@ -1,27 +1,29 @@
-'use client';
+"use client";
 
-import { Dialog } from '@headlessui/react';
-import { Trash2 } from 'lucide-react';
+import { Dialog } from "@headlessui/react";
+import { Trash2 } from "lucide-react";
 
-export default function ConfirmDeleteModal({ isOpen, onClose, onConfirm, itemName = 'este item' }) {
+export default function ConfirmDeleteModal({ isOpen, onClose, onConfirm, itemName = "este item" }) {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
       {/* Fundo transparente com blur */}
-      <div 
+      <div
         className="absolute inset-0 backdrop-blur-md bg-black/40 animate-in fade-in duration-300"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="
+      <div
+        className="
         relative bg-white rounded-xl sm:rounded-2xl shadow-2xl 
         w-full max-w-xs sm:max-w-md mx-2 sm:mx-0
         animate-in zoom-in-95 slide-in-from-bottom-4 duration-300
         border border-gray-200/50
         max-h-[90vh] overflow-y-auto
-      ">
+      "
+      >
         {/* Cabeçalho com ícone */}
         <div className="flex items-center gap-2 sm:gap-3 p-4 sm:p-6 border-b border-gray-100">
           <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-full text-red-600 flex-shrink-0">
@@ -34,11 +36,9 @@ export default function ConfirmDeleteModal({ isOpen, onClose, onConfirm, itemNam
 
         {/* Conteúdo */}
         <div className="p-4 sm:p-6 text-sm sm:text-base text-gray-600 leading-relaxed">
-          Tem certeza que deseja excluir <strong className="text-gray-800">{itemName}</strong>? 
+          Tem certeza que deseja excluir <strong className="text-gray-800">{itemName}</strong>?
           <br className="hidden sm:block" />
-          <span className="block sm:inline mt-1 sm:mt-0">
-            Esta ação não poderá ser desfeita.
-          </span>
+          <span className="block sm:inline mt-1 sm:mt-0">Esta ação não poderá ser desfeita.</span>
         </div>
 
         {/* Botões */}

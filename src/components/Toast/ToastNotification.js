@@ -1,6 +1,6 @@
 // src/components/Toast/ToastNotification.js
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const showSuccess = (message) => {
   toast.success(message);
@@ -13,7 +13,7 @@ export const showError = (message) => {
 export function ToastContainerWrapper() {
   return (
     <ToastContainer
-      position="top-right" 
+      position="top-right"
       autoClose={3000}
       hideProgressBar={false}
       newestOnTop={false}

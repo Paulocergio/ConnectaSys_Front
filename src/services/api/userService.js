@@ -1,37 +1,37 @@
 // src/services/api/userService.js
-import axios from 'axios';
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api/v1',
+  baseURL: "http://localhost:3000/api/v1",
 });
 
 export async function getUsers() {
-  const response = await api.get('/Users');
+  const response = await api.get("/Users");
   return {
-    data: response.data.map(user => ({
+    data: response.data.map((user) => ({
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      phone: user.phone ?? '', 
+      phone: user.phone ?? "",
       isActive: user.isActive,
       password: user.password,
       createdAt: user.createdAt,
-    }))
+    })),
   };
 }
 
-
-export async function deleteUser(id) {return api.delete(`/Users/${id}`);
+export async function deleteUser(id) {
+  return api.delete(`/Users/${id}`);
 }
 export async function updateUser(id, data) {
   const payload = {
     firstName: data.firstName,
     lastName: data.lastName,
     email: data.email,
-    phone: data.phone ?? '',
-    password: data.password, 
-    isActive: data.isActive
+    phone: data.phone ?? "",
+    password: data.password,
+    isActive: data.isActive,
   };
 
   return api.put(`/Users/${id}`, payload);
@@ -41,10 +41,9 @@ export async function createUser(data) {
     firstName: data.firstName,
     lastName: data.lastName,
     email: data.email,
-    phone: data.phone ?? '',
+    phone: data.phone ?? "",
     password: data.password,
     isActive: data.isActive,
   };
   return api.post(`/Users`, payload);
 }
-

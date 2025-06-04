@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Star, Quote, MessageSquare, User, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Star, Quote, MessageSquare, User, MapPin } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
 
 export default function Testimonials() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -16,10 +16,11 @@ export default function Testimonials() {
       role: "Proprietário de Oficina",
       location: "Belo Horizonte, MG",
       avatar: "/api/placeholder/128/128?text=RO",
-      content: "Desde que implementei o ConnectaSys, reduzi em 40% o tempo gasto com tarefas administrativas. Agora consigo focar no que realmente importa: servir meus clientes com qualidade.",
+      content:
+        "Desde que implementei o ConnectaSys, reduzi em 40% o tempo gasto com tarefas administrativas. Agora consigo focar no que realmente importa: servir meus clientes com qualidade.",
       rating: 5,
       highlight: "40% menos tempo em tarefas administrativas",
-      company: "Oficina do Rafael"
+      company: "Oficina do Rafael",
     },
     {
       id: 2,
@@ -27,10 +28,11 @@ export default function Testimonials() {
       role: "Gerente Financeira",
       location: "São Paulo, SP",
       avatar: "/api/placeholder/128/128?text=FS",
-      content: "O controle financeiro do sistema é impressionante. Consigo visualizar exatamente a lucratividade de cada serviço e identificar oportunidades de melhoria.",
+      content:
+        "O controle financeiro do sistema é impressionante. Consigo visualizar exatamente a lucratividade de cada serviço e identificar oportunidades de melhoria.",
       rating: 5,
       highlight: "Visualização exata da lucratividade",
-      company: "Auto Center Express"
+      company: "Auto Center Express",
     },
     {
       id: 3,
@@ -38,10 +40,11 @@ export default function Testimonials() {
       role: "Mecânico Chefe",
       location: "Curitiba, PR",
       avatar: "/api/placeholder/128/128?text=CM",
-      content: "A gestão de ordens de serviço facilitou muito o meu dia a dia. Todas as informações em um só lugar, sem papelada e sem confusão.",
+      content:
+        "A gestão de ordens de serviço facilitou muito o meu dia a dia. Todas as informações em um só lugar, sem papelada e sem confusão.",
       rating: 4,
       highlight: "Sem papelada, sem confusão",
-      company: "Mendes Automecânica"
+      company: "Mendes Automecânica",
     },
     {
       id: 4,
@@ -49,10 +52,11 @@ export default function Testimonials() {
       role: "Atendente",
       location: "Rio de Janeiro, RJ",
       avatar: "/api/placeholder/128/128?text=MC",
-      content: "Atender os clientes ficou muito mais fácil. Consigo acessar todo o histórico do veículo em segundos, o que impressiona nossos clientes.",
+      content:
+        "Atender os clientes ficou muito mais fácil. Consigo acessar todo o histórico do veículo em segundos, o que impressiona nossos clientes.",
       rating: 5,
       highlight: "Histórico completo em segundos",
-      company: "Oficina Carioca"
+      company: "Oficina Carioca",
     },
     {
       id: 5,
@@ -60,11 +64,12 @@ export default function Testimonials() {
       role: "Dono de Rede de Oficinas",
       location: "Brasília, DF",
       avatar: "/api/placeholder/128/128?text=PR",
-      content: "Com 3 unidades para administrar, o ConnectaSys se tornou indispensável. A visão consolidada e os relatórios detalhados me ajudam a tomar decisões estratégicas.",
+      content:
+        "Com 3 unidades para administrar, o ConnectaSys se tornou indispensável. A visão consolidada e os relatórios detalhados me ajudam a tomar decisões estratégicas.",
       rating: 5,
       highlight: "Visão consolidada para múltiplas unidades",
-      company: "Rede AutoPaulo"
-    }
+      company: "Rede AutoPaulo",
+    },
   ];
 
   // Setup autoplay
@@ -130,7 +135,9 @@ export default function Testimonials() {
   };
 
   return (
-    <section id="depoimentos" className="py-24 px-6 relative overflow-hidden bg-[#101218] text-white"
+    <section
+      id="depoimentos"
+      className="py-24 px-6 relative overflow-hidden bg-[#101218] text-white"
       onMouseEnter={pauseAutoplay}
       onMouseLeave={resumeAutoplay}
     >
@@ -185,9 +192,9 @@ export default function Testimonials() {
                           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 blur-sm opacity-70 group-hover:opacity-100 transition-opacity"></div>
                           <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-full opacity-30 group-hover:opacity-60 blur-md transition-all duration-300"></div>
                           <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-[#050B16] shadow-lg shadow-indigo-500/20">
-                            {testimonial.avatar.includes('?text=') ? (
+                            {testimonial.avatar.includes("?text=") ? (
                               <div className="w-full h-full flex items-center justify-center bg-[#101218] text-white text-xl md:text-2xl font-bold">
-                                {testimonial.avatar.split('=')[1]}
+                                {testimonial.avatar.split("=")[1]}
                               </div>
                             ) : (
                               <img
@@ -204,7 +211,9 @@ export default function Testimonials() {
 
                         {/* User Info */}
                         <div className="text-center md:text-left mb-8">
-                          <h4 className="font-semibold text-white text-xl mb-1">{testimonial.name}</h4>
+                          <h4 className="font-semibold text-white text-xl mb-1">
+                            {testimonial.name}
+                          </h4>
                           <p className="text-gray-400">{testimonial.role}</p>
                           <p className="text-gray-500 text-sm">{testimonial.company}</p>
 
@@ -214,10 +223,11 @@ export default function Testimonials() {
                               <Star
                                 key={i}
                                 size={16}
-                                className={`${i < testimonial.rating
-                                    ? 'text-yellow-500 fill-yellow-500'
-                                    : 'text-gray-600'
-                                  } mr-1`}
+                                className={`${
+                                  i < testimonial.rating
+                                    ? "text-yellow-500 fill-yellow-500"
+                                    : "text-gray-600"
+                                } mr-1`}
                               />
                             ))}
                           </div>
@@ -241,10 +251,7 @@ export default function Testimonials() {
                       {/* Right Column - Testimonial Content */}
                       <div className="md:col-span-8 relative">
                         {/* Large Quote Mark */}
-                        <Quote
-                          size={60}
-                          className="absolute -top-4 -left-2 text-indigo-500/20"
-                        />
+                        <Quote size={60} className="absolute -top-4 -left-2 text-indigo-500/20" />
 
                         {/* Testimonial Text */}
                         <div className="bg-[#070E1D]/50 backdrop-blur-sm p-6 md:p-8 rounded-xl border border-indigo-500/10 relative ml-4">
@@ -293,8 +300,11 @@ export default function Testimonials() {
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`relative h-3 rounded-full transition-all duration-300 ${currentSlide === index ? 'w-10 bg-gradient-to-r from-indigo-500 to-purple-600' : 'w-3 bg-gray-700 hover:bg-gray-600'
-                }`}
+              className={`relative h-3 rounded-full transition-all duration-300 ${
+                currentSlide === index
+                  ? "w-10 bg-gradient-to-r from-indigo-500 to-purple-600"
+                  : "w-3 bg-gray-700 hover:bg-gray-600"
+              }`}
               aria-label={`Ir para depoimento ${index + 1}`}
             >
               {currentSlide === index && (
@@ -310,9 +320,12 @@ export default function Testimonials() {
             { label: "Oficinas atendidas", value: "1,200+" },
             { label: "Avaliação média", value: "4.9/5" },
             { label: "Estados", value: "27" },
-            { label: "Horas economizadas", value: "125,000+" }
+            { label: "Horas economizadas", value: "125,000+" },
           ].map((stat, idx) => (
-            <div key={idx} className="bg-[#060D1A]/80 backdrop-blur-sm p-6 rounded-xl border border-gray-800/50">
+            <div
+              key={idx}
+              className="bg-[#060D1A]/80 backdrop-blur-sm p-6 rounded-xl border border-gray-800/50"
+            >
               <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent mb-2">
                 {stat.value}
               </div>

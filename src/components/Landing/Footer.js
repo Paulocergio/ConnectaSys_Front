@@ -1,7 +1,7 @@
 "use client";
 
-import React from 'react';
-import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import React from "react";
 
 export default function Footer() {
   return (
@@ -25,26 +25,30 @@ export default function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="flex items-start">
               <MapPin className="text-indigo-400 mr-3 flex-shrink-0 mt-1" size={20} />
-              <p>Rua Dinis Dias, 510 - CEP: 30295-260<br />Belo Horizonte, MG</p>
+              <p>
+                Rua Dinis Dias, 510 - CEP: 30295-260
+                <br />
+                Belo Horizonte, MG
+              </p>
             </div>
-            
+
             <div className="flex items-center">
               <Phone className="text-indigo-400 mr-3 flex-shrink-0" size={20} />
               <p>(31) 3333-4444</p>
             </div>
-            
+
             <div className="flex items-center">
               <Mail className="text-indigo-400 mr-3 flex-shrink-0" size={20} />
               <p>contato@connectasys.com.br</p>
             </div>
-            
+
             <div className="flex items-center">
               <Clock className="text-indigo-400 mr-3 flex-shrink-0" size={20} />
               <p>Segunda a Sexta, 8h às 18h</p>
             </div>
           </div>
         </div>
-        
+
         <div className="border-t border-gray-800/50 mt-10 pt-6 text-center text-sm">
           © {new Date().getFullYear()} ConnectaSys. Todos os direitos reservados.
         </div>
