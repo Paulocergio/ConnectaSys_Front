@@ -1,145 +1,229 @@
 'use client';
 
-import {
-  User,
-  Mail,
-  Phone,
-  Calendar,
+import { useState, useEffect } from 'react';
+import { 
+  Eye, 
+  EyeOff, 
+  User, 
+  Mail, 
+  Phone, 
+  Calendar, 
   Lock,
-  FileText,
-  MapPin
+  UserPlus
 } from 'lucide-react';
 
-export default function ModalEditGeneric({
+export default function ModalAddGeneric({
   isOpen,
   onClose,
-  formData,
-  onChange,
-  onSubmit,
-  title = 'Editar',
-  labels = {},
+  onSave,
   fields = [],
-  checkboxLast = false
+  title = 'Cadastro de Usuário'
 }) {
+  const [formData, setFormData] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const initialData = fields.reduce((acc, field) => {
+        acc[field.name] = field.defaultValue || (field.type === 'checkbox' ? false : '');
+        return acc;
+      }, {});
+      setFormData(initialData);
+    }
+  }, [isOpen, fields]);
+
   if (!isOpen) return null;
 
-  const effectiveFields = fields.length > 0
-    ? fields
-    : Object.keys(formData || {}).map(name => ({
-        name,
-        type: typeof formData[name] === 'boolean' ? 'checkbox' : 'text'
-      }));
+  const handleChange = e => {
+    const { name, value, type, checked } = e.target;
 
-  const inputKeys = effectiveFields
-    .filter(field => field.type !== 'checkbox' && field.name !== 'id')
-    .map(field => field.name);
+    let newValue = value;
 
-  const checkboxKeys = effectiveFields
-    .filter(field => field.type === 'checkbox')
-    .map(field => field.name);
+    if (name === 'telefone') {
+      const cleaned = value.replace(/\D/g, '').slice(0, 11);
+      newValue = cleaned.length <= 10
+        ? cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3')
+        : cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, '($1) $2-$3');
+    }
 
-  const iconMap = {
-    firstName: <User className="w-4 h-4" />,
-    lastName: <User className="w-4 h-4" />,
-    nome: <User className="w-4 h-4" />,
-    sobrenome: <User className="w-4 h-4" />,
-    documentNumber: <FileText className="w-4 h-4" />,
-    documento: <FileText className="w-4 h-4" />,
-    email: <Mail className="w-4 h-4" />,
-    phone: <Phone className="w-4 h-4" />,
-    telefone: <Phone className="w-4 h-4" />,
-    address: <MapPin className="w-4 h-4" />,
-    endereco: <MapPin className="w-4 h-4" />,
-    password: <Lock className="w-4 h-4" />,
-    confirmPassword: <Lock className="w-4 h-4" />,
-    birthDate: <Calendar className="w-4 h-4" />,
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : newValue
+    }));
   };
 
-  const renderInput = (key, value) => {
-    const icon = iconMap[key.toLowerCase()] || iconMap[key] || null;
-
-    return (
-      <div key={key} className="group relative">
-        <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1.5">
-          {icon}
-          {labels[key] || key}
-        </label>
-        <input
-          name={key}
-          value={value ?? ''}
-          onChange={onChange}
-          className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg
-                     focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-          placeholder={`Digite ${labels[key] || key}...`}
-        />
-      </div>
-    );
+  const handleSubmit = e => {
+    e.preventDefault();
+    onSave(formData);
+    onClose();
   };
-
-  const renderCheckbox = (key, value) => (
-    <div key={key} className="group relative">
-      <div className="flex items-center gap-2 p-2">
-        <input
-          type="checkbox"
-          name={key}
-          checked={value}
-          onChange={onChange}
-          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-400"
-          id={`checkbox-${key}`}
-        />
-        <label
-          htmlFor={`checkbox-${key}`}
-          className="text-sm font-medium text-gray-700 cursor-pointer"
-        >
-          {labels[key] || key}
-        </label>
-      </div>
-    </div>
-  );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
-      <div className="relative bg-white w-full max-w-2xl rounded-2xl shadow-xl p-8">
-        <form onSubmit={onSubmit} className="space-y-6">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <User className="w-8 h-8 text-white" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+      <div className="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden">
+        <div className="p-8">
+          {/* Header com ícone do lado esquerdo */}
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+              <User className="w-6 h-6 text-white" />
             </div>
-            <h2 className="text-lg font-bold text-gray-700">{title}</h2>
-            <p className="text-sm text-gray-500">Preencha os campos abaixo para editar os dados.</p>
+            <div className="text-left">
+              <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+              <p className="text-sm text-gray-500">Preencha os dados abaixo para criar sua conta.</p>
+            </div>
           </div>
 
-          {inputKeys.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {inputKeys.map(key => renderInput(key, formData[key]))}
+          {/* Campos do formulário */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                <User className="w-5 h-5 text-gray-500" />
+                Nome completo *
+              </label>
+              <input
+                name="nome"
+                value={formData.nome || ''}
+                onChange={handleChange}
+                placeholder="Nome completo..."
+                required
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl
+                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white
+                           text-sm text-gray-900 placeholder-gray-400 transition-all duration-200 hover:border-gray-300"
+              />
             </div>
-          )}
 
-          {checkboxKeys.length > 0 && (
-            <div className="pt-2">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Configurações</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {checkboxKeys.map(key => renderCheckbox(key, formData[key]))}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                <Mail className="w-5 h-5 text-gray-500" />
+                Email *
+              </label>
+              <input
+                name="email"
+                type="email"
+                value={formData.email || ''}
+                onChange={handleChange}
+                placeholder="Email..."
+                required
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl
+                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white
+                           text-sm text-gray-900 placeholder-gray-400 transition-all duration-200 hover:border-gray-300"
+              />
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                <Phone className="w-5 h-5 text-gray-500" />
+                Telefone
+              </label>
+              <input
+                name="telefone"
+                value={formData.telefone || ''}
+                onChange={handleChange}
+                placeholder="Telefone..."
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl
+                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white
+                           text-sm text-gray-900 placeholder-gray-400 transition-all duration-200 hover:border-gray-300"
+              />
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                <Calendar className="w-5 h-5 text-gray-500" />
+                Data de Nascimento
+              </label>
+              <input
+                name="dataNascimento"
+                type="date"
+                value={formData.dataNascimento || ''}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl
+                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white
+                           text-sm text-gray-900 placeholder-gray-400 transition-all duration-200 hover:border-gray-300"
+              />
+            </div>
+
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                <Lock className="w-5 h-5 text-gray-500" />
+                Senha *
+              </label>
+              <div className="relative">
+                <input
+                  name="senha"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.senha || ''}
+                  onChange={handleChange}
+                  placeholder="Senha..."
+                  required
+                  minLength={6}
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl pr-12
+                             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white
+                             text-sm text-gray-900 placeholder-gray-400 transition-all duration-200 hover:border-gray-300"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
-          )}
 
-          <div className="flex gap-3 pt-4">
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                <Lock className="w-5 h-5 text-gray-500" />
+                Confirmar Senha *
+              </label>
+              <div className="relative">
+                <input
+                  name="confirmarSenha"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={formData.confirmarSenha || ''}
+                  onChange={handleChange}
+                  placeholder="Confirmar senha..."
+                  required
+                  minLength={6}
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl pr-12
+                             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white
+                             text-sm text-gray-900 placeholder-gray-400 transition-all duration-200 hover:border-gray-300"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-xs text-gray-400 mb-8">* Campos obrigatórios</p>
+
+          {/* Botões menores */}
+          <div className="flex gap-3 justify-end">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 border border-gray-300 rounded-lg py-2 text-gray-700 hover:bg-gray-100"
+              className="px-6 py-2.5 border border-gray-300 rounded-xl text-gray-700 
+                         hover:bg-gray-50 transition-all duration-200 text-sm font-medium"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all"
+              onClick={handleSubmit}
+              className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white 
+                         rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200
+                         text-sm font-medium flex items-center gap-2 shadow-lg hover:shadow-xl"
             >
-              Salvar
+              <UserPlus className="w-4 h-4" />
+              Cadastrar
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
