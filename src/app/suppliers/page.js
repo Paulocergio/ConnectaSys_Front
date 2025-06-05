@@ -13,7 +13,7 @@ export default function Suppliers() {
             <main className="flex-1 p-6 bg-gray-50 overflow-auto">
                 <Table
                     title="Fornercedores"
-                    data={[]} // Aqui você deve passar os dados dos fornecedores
+                    data={[]} 
 
 
 
