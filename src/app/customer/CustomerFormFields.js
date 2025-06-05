@@ -45,12 +45,14 @@ export default function CustomerFormFields({ formData, onChange }) {
         onChange={onChange}
         required
       />
+
       <InputField
         label="Telefone"
         name="phone"
         icon={<Phone />}
         value={formData.phone}
         onChange={onChange}
+        mask="(99) 99999-9999"
       />
     </>
   );

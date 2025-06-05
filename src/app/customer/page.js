@@ -64,28 +64,51 @@ export default function CustomerPage() {
   // Função para abrir modal de editar
   const handleEditClick = (customer) => {
     const { createdAt, updatedAt, deletedAt, password, ...cleaned } = customer;
-    setFormData({ ...cleaned, id: customer.id });
+    setFormData({ ...cleaned, id: customer.id }); // <-- este ID precisa estar presente!
     setIsModalOpen(true);
   };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    let newValue = value;
+
+    if (name === "phone") {
+      const cleaned = value.replace(/\D/g, "").slice(0, 11);
+      newValue =
+        cleaned.length <= 10
+          ? cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3")
+          : cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, "($1) $2-$3");
+    }
+
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : newValue,
     }));
   };
 
   // Função para salvar edição
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e && typeof e.preventDefault === "function") {
+      e.preventDefault();
+    }
+
+    console.log("🔧 Submetendo edição", formData);
+
     try {
       const { password, updatedAt, createdAt, ...sanitizedData } = formData;
+
+      if (!formData.id) {
+        showError("ID do cliente ausente. Não é possível editar.");
+        return;
+      }
+
       await updateCustomer(formData.id, sanitizedData);
       await fetchCustomers();
+
       showSuccess("Cliente atualizado com sucesso");
       setIsModalOpen(false);
     } catch (error) {
+      console.error("❌ Erro ao atualizar:", error);
       showError(error.message || "Erro ao atualizar cliente");
     }
   };
@@ -271,28 +294,11 @@ export default function CustomerPage() {
         onClose={handleCloseEditModal}
         formData={formData}
         onChange={handleChange}
-        onSubmit={handleSubmit}
+        onSave={handleSubmit} // <- aqui está a correção
         title="Editar Cliente"
-        labels={{
-          firstName: "Nome",
-          lastName: "Sobrenome",
-          documentNumber: "Documento",
-          email: "Email",
-          phone: "Telefone",
-          address: "Endereço",
-          isActive: "Ativo",
-        }}
-        fields={[
-          { name: "firstName" },
-          { name: "lastName" },
-          { name: "documentNumber" },
-          { name: "email" },
-          { name: "phone" },
-          { name: "address" },
-          { name: "isActive", type: "checkbox" },
-        ]}
-        checkboxLast={true}
-      />
+      >
+        <CustomerFormFields formData={formData} onChange={handleChange} />
+      </ModalEditGeneric>
 
       {/* Modal de confirmação de exclusão */}
       <ConfirmDeleteModal

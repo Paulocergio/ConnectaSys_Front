@@ -1,8 +1,14 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
-export default function ModalAddGeneric({ isOpen, onClose, onSave, children, title = "Cadastro" }) {
+export default function ModalEditGeneric({
+  isOpen,
+  onClose,
+  onSave,
+  children,
+  title = 'Cadastro',
+}) {
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
