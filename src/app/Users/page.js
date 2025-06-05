@@ -228,14 +228,14 @@ export default function UsersPage() {
       </main>
 
       {isModalOpen && (
-        <ModalAddGeneric
+        <ModalEditGeneric
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSave={handleSubmit}
           title="Editar Usuário"
         >
           <UserFormFields formData={formData} onChange={handleChange} showIsActive={true} />
-        </ModalAddGeneric>
+        </ModalEditGeneric>
       )}
 
       <ModalConfirmDelete
