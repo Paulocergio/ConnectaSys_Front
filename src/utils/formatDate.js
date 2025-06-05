@@ -1,4 +1,4 @@
 export const formatDate = (dateStr) => {
   const date = new Date(dateStr);
-  return date.toLocaleDateString('pt-BR');
+  return date.toLocaleDateString("pt-BR");
 };

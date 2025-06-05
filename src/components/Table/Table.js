@@ -1,100 +1,87 @@
-'use client';
+"use client";
 
-import { useState, useEffect, Fragment } from 'react';
 import {
-  ChevronDown,
-  ChevronUp,
+  Plus,
   Search,
   X,
-  Table as TableIcon,
-  Filter,
   ArrowUp,
   ArrowDown,
   ChevronLeft,
   ChevronRight,
-  Edit,
-  Trash2,
+  Users,
   Eye,
-  MoreVertical,
-  Share,
-  Download
-} from 'lucide-react';
-import ModalEditProject from '../Modals/ModalEditProject';
+  Menu,
+} from "lucide-react";
+import { useState, useEffect, Fragment } from "react";
 
 export default function Table({
   columns = [],
   data = [],
-  title,
+  title = "Usuários",
   showHeader = true,
   emptyText = "Nenhum dado encontrado",
   loading = false,
-  striped = false,         // não usado mais
   onRowClick,
-  renderExpandedRow
+  onAddClick,
+  children,
 }) {
   const [sortColumn, setSortColumn] = useState(null);
-  const [sortDirection, setSortDirection] = useState('asc');
-  const [filterText, setFilterText] = useState('');
+  const [sortDirection, setSortDirection] = useState("asc");
+  const [filterText, setFilterText] = useState("");
   const [filteredData, setFilteredData] = useState([...data]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
-  const [expandedRows, setExpandedRows] = useState({});
-  const [showFilters, setShowFilters] = useState(false);
-  const [columnFilters, setColumnFilters] = useState({});
-  const [actionMenuOpen, setActionMenuOpen] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState(null);
+  const [pageSize, setPageSize] = useState(7);
+  const [isMobile, setIsMobile] = useState(false);
+  const [expandedRows, setExpandedRows] = useState(new Set());
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     setCurrentPage(1);
     applyFilters();
-  }, [data, filterText, columnFilters]);
+  }, [data, filterText]);
 
   const applyFilters = () => {
     let result = [...data];
     if (filterText.trim()) {
       const lower = filterText.toLowerCase();
-      result = result.filter(item =>
-        Object.keys(item).some(key =>
-          (typeof item[key] === 'string' || typeof item[key] === 'number') &&
-          String(item[key]).toLowerCase().includes(lower)
-        )
+      result = result.filter((item) =>
+        Object.keys(item).some(
+          (key) =>
+            (typeof item[key] === "string" || typeof item[key] === "number") &&
+            String(item[key]).toLowerCase().includes(lower),
+        ),
       );
     }
-    Object.entries(columnFilters).forEach(([key, value]) => {
-      if (value.trim()) {
-        const lower = value.toLowerCase();
-        result = result.filter(item =>
-          String(item[key]).toLowerCase().includes(lower)
-        );
-      }
-    });
     setFilteredData(result);
   };
 
-  const handleSort = column => {
+  const handleSort = (column) => {
     if (column.sortable === false) return;
     if (sortColumn === column.key) {
-      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
     } else {
       setSortColumn(column.key);
-      setSortDirection('asc');
+      setSortDirection("asc");
     }
   };
 
-  const toggleRowExpand = id =>
-    setExpandedRows(prev => ({ ...prev, [id]: !prev[id] }));
-
-  const toggleActionMenu = id =>
-    setActionMenuOpen(prev => (prev === id ? null : id));
-
-  const handleEdit = project => {
-    setSelectedProject(project);
-    setIsModalOpen(true);
-  };
-  const handleSaveProject = updated => {
-    console.log('Projeto atualizado:', updated);
-    setIsModalOpen(false);
+  const toggleRowExpansion = (rowIndex) => {
+    const newExpanded = new Set(expandedRows);
+    if (newExpanded.has(rowIndex)) {
+      newExpanded.delete(rowIndex);
+    } else {
+      newExpanded.add(rowIndex);
+    }
+    setExpandedRows(newExpanded);
   };
 
   const sortedData = [...filteredData];
@@ -102,304 +89,329 @@ export default function Table({
     sortedData.sort((a, b) => {
       const va = a[sortColumn];
       const vb = b[sortColumn];
-      if (typeof va === 'string') {
-        return sortDirection === 'asc'
-          ? va.localeCompare(vb)
-          : vb.localeCompare(va);
+      if (typeof va === "string") {
+        return sortDirection === "asc" ? va.localeCompare(vb) : vb.localeCompare(va);
       }
-      return sortDirection === 'asc' ? va - vb : vb - va;
+      return sortDirection === "asc" ? va - vb : vb - va;
     });
   }
 
   const totalPages = Math.ceil(sortedData.length / pageSize);
-  const paginatedData = sortedData.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  const paginatedData = sortedData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-  const renderProgress = progress => {
-    const val = parseInt(progress);
-    let color = 'bg-blue-500';
-    if (val >= 100) color = 'bg-green-500';
-    else if (val >= 70) color = 'bg-blue-500';
-    else if (val >= 40) color = 'bg-yellow-500';
-    else color = 'bg-red-500';
-    return (
-      <div className="w-full bg-gray-200 rounded-full h-2.5">
-        <div
-          className={`${color} h-2.5 rounded-full`}
-          style={{ width: progress }}
-        />
-      </div>
-    );
-  };
+  const getPaginationRange = () => {
+    const range = [];
+    const showPages = isMobile ? 3 : 5;
+    let start = Math.max(1, currentPage - Math.floor(showPages / 2));
+    let end = Math.min(totalPages, start + showPages - 1);
 
-  const renderStatus = status => {
-    let bg, text;
-    switch (status) {
-      case 'Concluído':
-        bg = 'bg-green-100';
-        text = 'text-green-800';
-        break;
-      case 'Em andamento':
-        bg = 'bg-blue-100';
-        text = 'text-blue-800';
-        break;
-      case 'Pendente':
-        bg = 'bg-yellow-100';
-        text = 'text-yellow-800';
-        break;
-      default:
-        bg = 'bg-gray-100';
-        text = 'text-gray-800';
+    if (end - start + 1 < showPages && start > 1) {
+      start = Math.max(1, end - showPages + 1);
     }
-    return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${bg} ${text}`}>
-        {status}
-      </span>
-    );
+
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+    return range;
   };
 
-  const getProjectDetails = project => ({
-    description: 'Descrição detalhada do projeto ' + project.name,
-    startDate: '01/01/2023',
-    endDate: '31/12/2023',
-    manager: 'João Silva',
-    team: ['Ana Costa', 'Carlos Oliveira', 'Mariana Santos'],
-    budget: 'R$ 50.000,00',
-    tasks: [
-      { name: 'Planejamento', status: 'Concluído', deadline: '15/01/2023' },
-      { name: 'Desenvolvimento', status: 'Em andamento', deadline: '30/07/2023' },
-      { name: 'Testes', status: 'Pendente', deadline: '31/10/2023' },
-      { name: 'Implementação', status: 'Pendente', deadline: '15/12/2023' }
-    ]
-  });
+  // Determinar colunas visíveis para mobile
+  const primaryColumns = columns.filter((col) => col.priority === "high" || col.primary);
+  const secondaryColumns = columns.filter((col) => !col.primary && col.priority !== "high");
+  const visibleColumns = isMobile
+    ? primaryColumns.length > 0
+      ? primaryColumns.slice(0, 2)
+      : columns.slice(0, 2)
+    : columns;
 
-  return (
-    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-      {/* HEADER */}
-      <div className="px-6 py-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 border-b border-gray-200 bg-white">
-        {title && (
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-            <span className="mr-2 text-indigo-600">
-              <TableIcon size={20} />
-            </span>
-            {title}
-          </h3>
-        )}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`p-2 rounded-lg border ${
-              showFilters
-                ? 'bg-white border-indigo-200 text-indigo-600'
-                : 'border-gray-200 text-gray-600'
-            }`}
-          >
-            <Filter size={18} />
-          </button>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search size={18} className="text-gray-400" />
-            </div>
-            <input
-              type="text"
-              placeholder="Pesquisar..."
-              value={filterText}
-              onChange={e => setFilterText(e.target.value)}
-              className="pl-10 pr-10 py-2 bg-white border border-gray-200 rounded-lg w-full text-gray-800 placeholder-gray-400 focus:outline-none transition-all duration-200"
-            />
-            {filterText && (
+  const renderMobileCard = (row, index) => (
+    <div
+      key={row.id || index}
+      className="bg-white rounded-xl shadow-sm border border-slate-200 mb-3 overflow-hidden"
+    >
+      <div className="p-4">
+        {/* Linha principal com dados mais importantes */}
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1 min-w-0">
+            {visibleColumns.slice(0, 2).map((col, idx) => (
+              <div key={col.key} className={idx === 0 ? "mb-1" : ""}>
+                {idx === 0 ? (
+                  <div className="font-semibold text-slate-900 text-base truncate">
+                    {col.render ? col.render(row[col.key], row) : row[col.key]}
+                  </div>
+                ) : (
+                  <div className="text-sm text-slate-600 truncate">
+                    {col.render ? col.render(row[col.key], row) : row[col.key]}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Botões de ação */}
+          <div className="flex items-center gap-2 ml-3">
+            {secondaryColumns.length > 0 && (
               <button
-                onClick={() => setFilterText('')}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400"
+                onClick={() => toggleRowExpansion(index)}
+                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all duration-200"
               >
-                <X size={18} />
+                <Eye size={16} />
+              </button>
+            )}
+            {onRowClick && (
+              <button
+                onClick={() => onRowClick(row)}
+                className="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
+              >
+                <ChevronRight size={16} />
               </button>
             )}
           </div>
         </div>
-      </div>
 
-      {/* FILTROS */}
-      {showFilters && (
-        <div className="px-6 py-3 bg-white border-b border-gray-100 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {columns.map(col => (
-            <div key={col.key} className="flex flex-col">
-              <label className="text-xs font-medium text-gray-600 mb-1">{col.title}</label>
+        {/* Dados adicionais visíveis no mobile (se houver mais de 2 colunas) */}
+        {visibleColumns.length > 2 && (
+          <div className="grid grid-cols-1 gap-2 text-sm">
+            {visibleColumns.slice(2).map((col) => (
+              <div key={col.key} className="flex justify-between">
+                <span className="text-slate-500 font-medium">{col.title}:</span>
+                <span className="text-slate-700 text-right">
+                  {col.render ? col.render(row[col.key], row) : row[col.key]}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Dados expandidos */}
+        {expandedRows.has(index) && secondaryColumns.length > 0 && (
+          <div className="mt-3 pt-3 border-t border-slate-200">
+            <div className="grid grid-cols-1 gap-2 text-sm">
+              {secondaryColumns.map((col) => (
+                <div key={col.key} className="flex justify-between py-1">
+                  <span className="text-slate-500 font-medium">{col.title}:</span>
+                  <span className="text-slate-700 text-right">
+                    {col.render ? col.render(row[col.key], row) : row[col.key]}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="w-full mx-auto py-4 sm:py-6 lg:py-10 px-3 sm:px-4 lg:px-6">
+      {/* Header Section */}
+      <div className="mb-6 lg:mb-8">
+        <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-start sm:justify-between sm:gap-4 lg:gap-6">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 flex items-center gap-2 lg:gap-3">
+            <div className="p-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg">
+              <Users size={20} className="text-white sm:w-6 sm:h-6" />
+            </div>
+            <span className="truncate">{title}</span>
+          </h2>
+
+          <div className="flex flex-col xs:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
+            {/* Search Input */}
+            <div className="relative flex-1 sm:flex-initial">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search size={18} className="text-slate-400" />
+              </div>
               <input
                 type="text"
-                placeholder={`Filtrar ${col.title.toLowerCase()}...`}
-                value={columnFilters[col.key] || ''}
-                onChange={e =>
-                  setColumnFilters(prev => ({
-                    ...prev,
-                    [col.key]: e.target.value
-                  }))
-                }
-                className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
+                placeholder="Buscar..."
+                value={filterText}
+                onChange={(e) => setFilterText(e.target.value)}
+                className="pl-10 pr-10 py-3 w-full sm:w-64 lg:w-72 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 shadow-sm transition-all duration-200"
               />
+              {filterText && (
+                <button
+                  onClick={() => setFilterText("")}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              )}
             </div>
-          ))}
-        </div>
-      )}
 
-      {/* TABELA */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          {showHeader && (
-            <thead>
-              <tr className="bg-white">
-                <th className="w-10 px-3 py-3.5"></th>
-                {columns.map(col => (
-                  <th
-                    key={col.key}
-                    onClick={() => col.sortable !== false && handleSort(col)}
-                    className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider cursor-pointer"
-                  >
-                    <div className="flex items-center">
-                      {col.title}
-                      {col.sortable !== false && (
-                        <span className="ml-1.5">
-                          {sortColumn === col.key ? (
-                            sortDirection === 'asc' ? (
-                              <ArrowUp size={16} className="text-indigo-500" />
-                            ) : (
-                              <ArrowDown size={16} className="text-indigo-500" />
-                            )
-                          ) : (
-                            <div className="text-gray-300 h-4 w-4 flex flex-col items-center justify-center">
-                              <ArrowUp size={12} strokeWidth={1.5} />
-                              <ArrowDown
-                                size={12}
-                                strokeWidth={1.5}
-                                style={{ marginTop: '-4px' }}
-                              />
-                            </div>
-                          )}
-                        </span>
-                      )}
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-          )}
-          <tbody className="bg-white divide-y divide-gray-200">
-            {loading ? (
-              <tr>
-                <td colSpan={columns.length + 1} className="px-6 py-10 text-center">
-                  {/* ... spinner ... */}
-                </td>
-              </tr>
-            ) : paginatedData.length === 0 ? (
-              <tr>
-                <td colSpan={columns.length + 1} className="px-6 py-10 text-center">
-                  {/* ... empty ... */}
-                </td>
-              </tr>
-            ) : (
-              paginatedData.map((row, i) => (
-                <Fragment key={row.id || i}>
-                  <tr
-                    className={`${onRowClick ? 'cursor-pointer' : ''}`}
-                    onClick={e => {
-                      if (
-                        e.target.closest('button[data-expand]') ||
-                        e.target.closest('div[data-actions]')
-                      )
-                        return;
-                      onRowClick && onRowClick(row);
-                    }}
-                  >
-                    <td className="w-10 py-4 pl-6 pr-3">
-                      <button
-                        data-expand="true"
-                        onClick={() => toggleRowExpand(row.id || i)}
-                        className="p-1 rounded-full text-gray-400"
-                      >
-                        {expandedRows[row.id || i] ? (
-                          <ChevronUp size={18} />
-                        ) : (
-                          <ChevronDown size={18} />
-                        )}
-                      </button>
-                    </td>
-                    {columns.map(col => (
-                      <td
-                        key={`${i}-${col.key}`}
-                        className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700"
-                      >
-                        {col.key === 'progress'
-                          ? renderProgress(row[col.key])
-                          : col.key === 'status'
-                          ? renderStatus(row[col.key])
-                          : col.key === 'actions'
-                          ? (
-                              <div data-actions="true" className="relative">
-                                {/* ... action buttons ... */}
-                              </div>
-                            )
-                          : col.render
-                          ? col.render(row[col.key], row)
-                          : row[col.key]}
-                      </td>
-                    ))}
-                  </tr>
-
-                  {renderExpandedRow && expandedRows[row.id || i] && (
-                    <tr className="bg-white border-b border-gray-200">
-                      <td colSpan={columns.length + 1} className="px-6 py-4">
-                        {renderExpandedRow(row)}
-                      </td>
-                    </tr>
-                  )}
-                </Fragment>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-
-      <div className="px-6 py-4 bg-white border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-sm text-gray-500 flex items-center space-x-2">
-          <span>Linhas por página:</span>
-          <select value={pageSize} onChange={e => { setPageSize(parseInt(e.target.value)); setCurrentPage(1); }} className="border border-gray-200 rounded text-sm px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-            {[5, 10, 15, 25, 50].map(size => <option key={size} value={size}>{size}</option>)}
-          </select>
-        </div>
-        <div className="flex items-center">
-          <span className="text-sm text-gray-500 mr-4">
-            {filteredData.length > 0
-              ? `${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, sortedData.length)} de ${filteredData.length}`
-              : '0 resultados'}
-          </span>
-          <div className="flex items-center space-x-1">
-            <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className={`p-1.5 rounded ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'}`}>
-              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 17l-5-5 5-5M17 17l-5-5 5-5" /></svg>
-            </button>
-            <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1} className={`p-1.5 rounded ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'}`}><ChevronLeft size={20} /></button>
-            <div className="hidden sm:flex items-center">
-              {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                let num;
-                if (totalPages <= 5) num = i + 1;
-                else if (currentPage <= 3) num = i + 1;
-                else if (currentPage >= totalPages - 2) num = totalPages - 4 + i;
-                else num = currentPage - 2 + i;
-                return num > 0 && num <= totalPages ? (
-                  <button key={num} onClick={() => setCurrentPage(num)} className={`w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium ${currentPage === num ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>{num}</button>
-                ) : null;
-              })}
-            </div>
-            <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages || totalPages === 0} className={`p-1.5 rounded ${(currentPage === totalPages || totalPages === 0) ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'}`}><ChevronRight size={20} /></button>
-            <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0} className={`p-1.5 rounded ${(currentPage === totalPages || totalPages === 0) ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'}`}>
-              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 17l5-5-5-5M7 17l5-5-5-5" /></svg>
+            {/* Add Button */}
+            <button
+              onClick={() => onAddClick && onAddClick()}
+              className="flex items-center justify-center gap-2 px-4 lg:px-6 py-3 text-sm font-medium bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl group whitespace-nowrap"
+            >
+              <Plus size={16} className="group-hover:rotate-90 transition-transform duration-200" />
+              <span className="hidden xs:inline">Adicionar</span>
+              <span className="xs:hidden">Adicionar</span>
             </button>
           </div>
         </div>
+
+        {children && <div className="mt-4 lg:mt-6">{children}</div>}
       </div>
-      <ModalEditProject isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} project={selectedProject} onSave={handleSaveProject} />
+
+      {/* Content */}
+      {loading ? (
+        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-12 lg:p-16 text-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="text-slate-500">Carregando...</span>
+          </div>
+        </div>
+      ) : paginatedData.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-12 lg:p-16 text-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="p-3 bg-slate-100 rounded-full">
+              <Search size={24} className="text-slate-400" />
+            </div>
+            <span className="text-slate-500 font-medium">{emptyText}</span>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Mobile Cards View */}
+          {isMobile ? (
+            <div className="space-y-3">
+              {paginatedData.map((row, index) => renderMobileCard(row, index))}
+            </div>
+          ) : (
+            /* Desktop Table View */
+            <div className="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm text-slate-700">
+                  {showHeader && (
+                    <thead className="bg-gradient-to-r from-slate-50 to-slate-100">
+                      <tr>
+                        {columns.map((col) => (
+                          <th
+                            key={col.key}
+                            onClick={() => col.sortable !== false && handleSort(col)}
+                            className={`px-3 sm:px-4 lg:px-6 py-4 lg:py-5 text-left font-semibold text-xs uppercase tracking-wider whitespace-nowrap ${
+                              col.sortable !== false
+                                ? "cursor-pointer hover:bg-slate-200/50 transition-colors duration-200"
+                                : ""
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="text-slate-700">{col.title}</span>
+                              {col.sortable !== false && (
+                                <div className="flex flex-col">
+                                  {sortColumn === col.key ? (
+                                    sortDirection === "asc" ? (
+                                      <ArrowUp size={14} className="text-blue-600" />
+                                    ) : (
+                                      <ArrowDown size={14} className="text-blue-600" />
+                                    )
+                                  ) : (
+                                    <div className="flex flex-col text-slate-300 group-hover:text-slate-400">
+                                      <ArrowUp size={10} />
+                                      <ArrowDown size={10} className="-mt-1" />
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                  )}
+                  <tbody className="divide-y divide-slate-100">
+                    {paginatedData.map((row, i) => (
+                      <Fragment key={row.id || i}>
+                        <tr
+                          className={`hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-slate-50/50 transition-all duration-200 ${
+                            onRowClick ? "cursor-pointer" : ""
+                          } group`}
+                          onClick={() => onRowClick?.(row)}
+                        >
+                          {columns.map((col) => (
+                            <td
+                              key={col.key}
+                              className="px-3 sm:px-4 lg:px-6 py-4 lg:py-5 whitespace-nowrap group-hover:text-slate-800 transition-colors"
+                            >
+                              {col.render ? col.render(row[col.key], row) : row[col.key]}
+                            </td>
+                          ))}
+                        </tr>
+                      </Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Pagination */}
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-8 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          {/* Results Info */}
+          <div className="text-sm text-slate-600">
+            <span className="font-medium">Mostrar</span>{" "}
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(parseInt(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="ml-2 px-3 py-2 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              {[5, 10, 15, 20, 25, 50].map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>{" "}
+            de <span className="text-blue-600 font-bold">{filteredData.length}</span> resultados
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="flex items-center gap-2 flex-wrap justify-center">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className={`px-3 py-2 rounded-full text-sm ${
+                currentPage === 1
+                  ? "text-slate-300 cursor-not-allowed"
+                  : "text-slate-600 hover:text-blue-600 hover:bg-blue-50"
+              }`}
+            >
+              ‹
+            </button>
+
+            {getPaginationRange().map((pageNum) => (
+              <button
+                key={pageNum}
+                onClick={() => setCurrentPage(pageNum)}
+                className={`px-4 py-2 rounded-full font-medium text-sm transition-all ${
+                  currentPage === pageNum
+                    ? "bg-blue-600 text-white shadow-md transform scale-105"
+                    : "text-slate-600 hover:text-blue-600 hover:bg-blue-100"
+                }`}
+              >
+                {pageNum}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className={`px-3 py-2 rounded-full text-sm ${
+                currentPage === totalPages
+                  ? "text-slate-300 cursor-not-allowed"
+                  : "text-slate-600 hover:text-blue-600 hover:bg-blue-50"
+              }`}
+            >
+              ›
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

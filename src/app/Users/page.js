@@ -1,100 +1,251 @@
-// src/app/Users/page.js
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { getUsers } from '../../services/api/userService';
-import Sidebar from '../../components/Sidebar';
-import Table from '../../components/Table/Table';
+import ModalAddGeneric from "../../components/Modals/ModalAddGeneric";
+import ModalConfirmDelete from "../../components/Modals/ModalConfirmDelete";
+import ModalEditGeneric from "../../components/Modals/ModalEditGeneric";
+import Sidebar from "../../components/Sidebar";
+import Table from "../../components/Table/Table";
+import {
+  showSuccess,
+  showError,
+  ToastContainerWrapper,
+} from "../../components/Toast/ToastNotification";
+import { getUsers, deleteUser, updateUser, createUser } from "../../services/api/userService";
+import UserFormFields from "./UserFormFields";
+import { Edit, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
 
-// Modifique a linha de importação para incluir Phone
-import { User, Mail, MapPin, Calendar, Shield, Phone } from 'lucide-react';
+const initialUserData = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  password: "",
+  isActive: true,
+};
+
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [collapsed, setCollapsed] = useState(true);
+  const [formData, setFormData] = useState(initialUserData);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await getUsers();
+      const sorted = res.data.sort((a, b) => {
+        const nameA = `${a.firstName ?? ""} ${a.lastName ?? ""}`.toLowerCase();
+        const nameB = `${b.firstName ?? ""} ${b.lastName ?? ""}`.toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+      setUsers(sorted);
+    } catch (error) {
+      showError("Erro ao carregar usuários");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    getUsers()
-      .then(res => setUsers(res.data))
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
+    fetchUsers();
   }, []);
 
-  if (loading) return <p>Carregando usuários…</p>;
-  if (error) return <p>Erro ao carregar usuários.</p>;
+  const handleEditClick = (user) => {
+    setFormData({ ...user, password: "" });
+    setIsModalOpen(true);
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    let newValue = value;
+    if (name === "phone") {
+      const cleaned = value.replace(/\D/g, "").slice(0, 11);
+      newValue =
+        cleaned.length <= 10
+          ? cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3")
+          : cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, "($1) $2-$3");
+    }
+    setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : newValue }));
+  };
+  const handleSubmit = async (e) => {
+    e?.preventDefault(); // boa prática
+
+    try {
+      const { password, ...payload } = formData;
+      await updateUser(formData.id, payload);
+      await fetchUsers();
+      showSuccess("USUÁRIO ATUALIZADO COM SUCESSO");
+      setIsModalOpen(false);
+    } catch {
+      showError("ERRO AO ATUALIZAR USUÁRIO");
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      await createUser(formData);
+      await fetchUsers();
+      showSuccess("USUÁRIO ADICIONADO COM SUCESSO");
+      setIsAddModalOpen(false);
+      setFormData(initialUserData);
+    } catch (error) {
+      const backendMessage = error?.response?.data?.error || "Erro ao adicionar usuário.";
+      showError(backendMessage);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+    try {
+      await deleteUser(itemToDelete.id);
+      setUsers((prev) => prev.filter((u) => u.id !== itemToDelete.id));
+      showSuccess(`Usuário ${itemToDelete.firstName} excluído com sucesso`);
+    } catch {
+      showError("ERRO AO EXCLUIR USUÁRIO");
+    } finally {
+      setIsDeleteModalOpen(false);
+    }
+  };
 
   const columns = [
-    { key: 'id', title: 'ID', sortable: true },
-    { key: 'firstName', title: 'Nome', sortable: true },
-    { key: 'email', title: 'Email', sortable: true },
-    { key: 'phoneNumber', title: 'Telefone', sortable: true },
+    {
+      key: "name",
+      title: "Nome",
+      sortable: true,
+      render: (_, user) => (
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold uppercase text-xs">
+            {`${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`}
+          </div>
+          <div>
+            <div className="font-semibold text-slate-800 uppercase">
+              {`${user.firstName} ${user.lastName}`.toUpperCase()}
+            </div>
+            <div className="text-xs text-slate-500 uppercase">{user.email?.toUpperCase()}</div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "phone",
+      title: "Telefone",
+      sortable: false,
+      render: (_, user) => {
+        const cleaned = user.phone?.replace(/\D/g, "");
+        if (!cleaned) return "NÃO INFORMADO";
+        return cleaned.length <= 10
+          ? cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3")
+          : cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, "($1) $2-$3");
+      },
+    },
+    {
+      key: "createdAt",
+      title: "Criado em",
+      sortable: true,
+      render: (value) =>
+        new Date(value).toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+    },
+    {
+      key: "isActive",
+      title: "Status",
+      sortable: false,
+      render: (value) =>
+        value ? (
+          <span className="inline-flex items-center gap-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+            ATIVO
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+            INATIVO
+          </span>
+        ),
+    },
+    {
+      key: "actions",
+      title: "Ações",
+      sortable: false,
+      render: (_, user) => (
+        <div className="flex items-center gap-3">
+          <button
+            title="Editar"
+            className="text-slate-500 hover:text-blue-600"
+            onClick={() => handleEditClick(user)}
+          >
+            <Edit size={16} />
+          </button>
+          <button
+            title="Excluir"
+            className="text-slate-500 hover:text-red-600"
+            onClick={() => {
+              setItemToDelete(user);
+              setIsDeleteModalOpen(true);
+            }}
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      ),
+    },
   ];
 
-  // Função simplificada para renderizar detalhes do usuário
-  const renderUserDetails = user => (
-<div className="border rounded-lg p-4 shadow-sm bg-white">
-  <div className="flex flex-wrap gap-y-3">
-    {/* Linha 1 */}
-    <div className="flex items-center w-full md:w-1/2 xl:w-1/3 pr-4">
-      <User size={16} className="text-indigo-600 mr-2" />
-      <span className="font-medium text-gray-600 mr-1">Perfil:</span>
-      <span className="text-gray-800">{user.role} ({user.gender})</span>
-      {user.isActive && (
-        <span className="ml-2 bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">Ativo</span>
-      )}
-      {!user.isActive && (
-        <span className="ml-2 bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full">Inativo</span>
-      )}
-    </div>
-    
-    {/* Linha 2 */}
-    <div className="flex items-center w-full md:w-1/2 xl:w-1/3 pr-4">
-      <Mail size={16} className="text-indigo-600 mr-2" />
-      <span className="font-medium text-gray-600 mr-1">Email:</span>
-      <span className="text-indigo-600">{user.email}</span>
-    </div>
-    
-    {/* Linha 3 */}
-    <div className="flex items-center w-full md:w-1/2 xl:w-1/3 pr-4">
-      <Mail size={16} className="text-indigo-600 mr-2" />
-      <span className="font-medium text-gray-600 mr-1">Telefone:</span>
-      <span className="text-gray-800">{user.phoneNumber}</span>
-    </div>
-    
-    {/* Linha 4 */}
-    <div className="flex items-center w-full md:w-1/2 xl:w-1/3 pr-4">
-      <MapPin size={16} className="text-indigo-600 mr-2" />
-      <span className="font-medium text-gray-600 mr-1">Endereço:</span>
-      <span className="text-gray-800">{user.city}/{user.state}, {user.country}</span>
-    </div>
-    
-    {/* Linha 5 */}
-    <div className="flex items-center w-full md:w-1/2 xl:w-1/3 pr-4">
-      <Calendar size={16} className="text-indigo-600 mr-2" />
-      <span className="font-medium text-gray-600 mr-1">Criado:</span>
-      <span className="text-gray-800">{new Date(user.createdAt).toLocaleString()}</span>
-    </div>
-  </div>
-</div>
-  );
+  if (loading) return <p>Carregando usuários…</p>;
 
   return (
     <div className="flex h-screen">
-      <Sidebar
-        isCollapsed={collapsed}
-        toggleSidebar={() => setCollapsed(c => !c)}
-      />
+      <Sidebar isCollapsed={collapsed} toggleSidebar={() => setCollapsed((c) => !c)} />
       <main className="flex-1 p-6 bg-gray-50 overflow-auto">
         <Table
           title="Usuários"
           data={users}
           columns={columns}
           striped
-          onRowClick={() => {}}
-          renderExpandedRow={renderUserDetails}
+          onAddClick={() => {
+            setFormData(initialUserData);
+            setIsAddModalOpen(true);
+          }}
         />
+
+        {isAddModalOpen && (
+          <ModalAddGeneric
+            isOpen={isAddModalOpen}
+            onClose={() => setIsAddModalOpen(false)}
+            onSave={handleSave}
+            title="Adicionar Usuário"
+          >
+            <UserFormFields formData={formData} onChange={handleChange} />
+          </ModalAddGeneric>
+        )}
       </main>
+
+      {isModalOpen && (
+        <ModalEditGeneric
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSubmit}
+          title="Editar Usuário"
+        >
+          <UserFormFields formData={formData} onChange={handleChange} showIsActive={true} />
+        </ModalEditGeneric>
+      )}
+
+      <ModalConfirmDelete
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        itemName={itemToDelete?.firstName}
+      />
+
+      <ToastContainerWrapper />
     </div>
   );
 }

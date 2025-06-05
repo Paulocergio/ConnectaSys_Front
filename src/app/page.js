@@ -1,12 +1,9 @@
-import Menu from "../components/Landing/Menu";
-import Header from "../components/Landing/Header";
 import Features from "../components/Landing/Features";
+import Footer from "../components/Landing/Footer";
+import Header from "../components/Landing/Header";
+import Menu from "../components/Landing/Menu";
 import Pricing from "../components/Landing/Pricing";
 import Testimonials from "../components/Landing/Testimonials";
-import Footer from "../components/Landing/Footer";
-
-
-
 
 export default function LandingPage() {
   return (
