@@ -276,7 +276,7 @@ export default function CustomerPage() {
         />
       </main>
 
-      {/* Modal para adicionar cliente */}
+
       {isAddModalOpen && (
         <ModalAddGeneric
           isOpen={isAddModalOpen}
@@ -288,19 +288,19 @@ export default function CustomerPage() {
         </ModalAddGeneric>
       )}
 
-      {/* Modal para editar cliente */}
+
       <ModalEditGeneric
         isOpen={isModalOpen}
         onClose={handleCloseEditModal}
         formData={formData}
         onChange={handleChange}
-        onSave={handleSubmit} // <- aqui está a correção
+        onSave={handleSubmit} 
         title="Editar Cliente"
       >
         <CustomerFormFields formData={formData} onChange={handleChange} />
       </ModalEditGeneric>
 
-      {/* Modal de confirmação de exclusão */}
+
       <ConfirmDeleteModal
         isOpen={isDeleteModalOpen}
         onClose={handleCloseDeleteModal}
