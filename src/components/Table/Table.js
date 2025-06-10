@@ -57,8 +57,8 @@ export default function Table({
         Object.keys(item).some(
           (key) =>
             (typeof item[key] === "string" || typeof item[key] === "number") &&
-            String(item[key]).toLowerCase().includes(lower),
-        ),
+            String(item[key]).toLowerCase().includes(lower)
+        )
       );
     }
     setFilteredData(result);
