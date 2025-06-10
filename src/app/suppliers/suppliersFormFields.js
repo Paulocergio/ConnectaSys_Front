@@ -77,7 +77,6 @@ const SuppliersFormFields = memo(({ formData, onChange, onFill }) => {
             tax_id: formatDocument(doc),
           });
 
-
           setDocError("");
         } catch (error) {
           setDocError("⚠️ API de CNPJ indisponível. Preencha os dados manualmente.");
