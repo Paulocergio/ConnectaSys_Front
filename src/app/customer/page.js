@@ -276,7 +276,6 @@ export default function CustomerPage() {
         />
       </main>
 
-
       {isAddModalOpen && (
         <ModalAddGeneric
           isOpen={isAddModalOpen}
@@ -288,18 +287,16 @@ export default function CustomerPage() {
         </ModalAddGeneric>
       )}
 
-
       <ModalEditGeneric
         isOpen={isModalOpen}
         onClose={handleCloseEditModal}
         formData={formData}
         onChange={handleChange}
-        onSave={handleSubmit} 
+        onSave={handleSubmit}
         title="Editar Cliente"
       >
         <CustomerFormFields formData={formData} onChange={handleChange} />
       </ModalEditGeneric>
-
 
       <ConfirmDeleteModal
         isOpen={isDeleteModalOpen}

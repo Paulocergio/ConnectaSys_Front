@@ -28,7 +28,7 @@ export default function Suppliers() {
   const [formData, setFormData] = useState(initialSupplierData);
   const [suppliers, setSuppliers] = useState([]);
 
-  const toggleSidebar = useCallback(() => setIsSidebarCollapsed(prev => !prev), []);
+  const toggleSidebar = useCallback(() => setIsSidebarCollapsed((prev) => !prev), []);
 
   const handleAddClick = useCallback(() => {
     setFormData(initialSupplierData);
@@ -37,11 +37,11 @@ export default function Suppliers() {
 
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
 
   const handleFill = useCallback((newData) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const updated = { ...prev };
       if (!prev.company_name) updated.company_name = newData.company_name || prev.company_name;
       if (!prev.address) updated.address = newData.address || prev.address;
@@ -62,11 +62,10 @@ export default function Suppliers() {
     } catch (error) {
       console.error(error);
 
-
       if (error.response?.data?.error === "Email já existe") {
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
-          emailError: "Este e-mail já está cadastrado"
+          emailError: "Este e-mail já está cadastrado",
         }));
       } else {
         showError(error?.response?.data?.error || "Erro ao adicionar fornecedor.");
@@ -74,31 +73,24 @@ export default function Suppliers() {
     }
   }, [formData]);
 
-  const memoizedFormFields = useMemo(() => (
-    <SuppliersFormFields
-      formData={formData}
-      onChange={handleChange}
-      onFill={handleFill}
-    />
-  ), [formData, handleChange, handleFill]);
+  const memoizedFormFields = useMemo(
+    () => <SuppliersFormFields formData={formData} onChange={handleChange} onFill={handleFill} />,
+    [formData, handleChange, handleFill]
+  );
 
   return (
     <div className="flex h-screen">
       <Sidebar isCollapsed={isSidebarCollapsed} toggleSidebar={toggleSidebar} />
 
       <main className="flex-1 p-6 bg-gray-50 overflow-auto">
-        <Table
-          title="Fornecedores"
-          data={suppliers}
-          onAddClick={handleAddClick}
-        />
+        <Table title="Fornecedores" data={suppliers} onAddClick={handleAddClick} />
 
         <ModalAddGeneric
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSave={handleSave}
           title="Adicionar Fornecedor"
-          key={isModalOpen ? 'modal-open' : 'modal-closed'}
+          key={isModalOpen ? "modal-open" : "modal-closed"}
         >
           {memoizedFormFields}
         </ModalAddGeneric>

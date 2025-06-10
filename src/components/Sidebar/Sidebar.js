@@ -77,7 +77,7 @@ export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
         </svg>
       ),
     },
-      {
+    {
       path: "/suppliers",
       label: "Fornecedores",
       icon: (

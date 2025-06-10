@@ -19,7 +19,7 @@ export async function createSupplier(data) {
     isActive: data.is_active,
   };
 
-  return api.post(`/Suppliers`, payload); 
+  return api.post(`/Suppliers`, payload);
 }
 
 export async function getSuppliers() {
