@@ -73,23 +73,22 @@ const handleFill = (newData) => {
 
 
   const handleSave = async () => {
-    try {
-      await createSupplier(formData);
-      await fetchSuppliers();
-      showSuccess("Fornecedor adicionado com sucesso!");
-      setIsModalOpen(false);
-      setFormData(initialSupplierData);
-    } catch (error) {
-      if (error.response?.data?.error === "Email já existe") {
-        setFormData((prev) => ({
-          ...prev,
-          emailError: "Este e-mail já está cadastrado",
-        }));
-      } else {
-        showError(error?.response?.data?.error || "Erro ao adicionar fornecedor.");
-      }
+  try {
+    await createSupplier(formData);
+    await fetchSuppliers();
+    showSuccess("Fornecedor adicionado com sucesso!");
+    setIsModalOpen(false);
+    setFormData(initialSupplierData);
+  } catch (error) {
+    if (error.response?.data?.error === "Email já existe") {
+      showError("Este e-mail já está cadastrado"); 
+      
+    } else {
+      showError(error?.response?.data?.error || "Erro ao adicionar fornecedor.");
     }
-  };
+  }
+};
+
 
  const columns = [
   { key: "companyName", title: "Empresa", sortable: true },
