@@ -6,7 +6,17 @@ export async function fetchCnpjData(cnpj) {
 
   try {
     const response = await axios.get(`https://publica.cnpj.ws/cnpj/${cleaned}`);
-    return response.data;
+    const est = response.data.estabelecimento;
+    return {
+      razao_social: response.data.razao_social,
+      email: est?.email,
+      telefone1: est?.telefone1,
+      logradouro: est?.logradouro,
+      numero: est?.numero,
+      cidade: est?.cidade?.nome,
+      estado: est?.estado?.sigla,
+      cep: est?.cep,
+    };
   } catch (error) {
     console.error("Erro ao buscar CNPJ:", error);
     throw new Error("Erro ao consultar o CNPJ");

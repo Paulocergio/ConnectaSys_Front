@@ -63,15 +63,21 @@ const SuppliersFormFields = memo(({ formData, onChange, onFill }) => {
         // CNPJ
         try {
           const data = await fetchCnpjData(doc);
+          const est = data.estabelecimento;
+
           onFill({
             company_name: data.razao_social || "",
-            address: `${data.estabelecimento?.logradouro || ""}, ${data.estabelecimento?.numero || ""}`,
-            city: data.estabelecimento?.cidade?.nome || "",
-            state: data.estabelecimento?.estado?.sigla || "",
-            zip_code: data.estabelecimento?.cep || "",
+            address: [data.logradouro, data.numero].filter(Boolean).join(", "),
+            city: data.cidade || "",
+            state: data.estado || "",
+            zip_code: data.cep || "",
             country: "Brasil",
+            email: data.email || "",
+            phone: data.telefone1 || "",
             tax_id: formatDocument(doc),
           });
+
+
           setDocError("");
         } catch (error) {
           setDocError("⚠️ API de CNPJ indisponível. Preencha os dados manualmente.");
