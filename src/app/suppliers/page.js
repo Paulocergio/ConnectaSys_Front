@@ -92,7 +92,6 @@ const handleFill = (newData) => {
   };
 
  const columns = [
-  { key: "id", title: "ID", sortable: true },
   { key: "companyName", title: "Empresa", sortable: true },
   { key: "contactName", title: "Contato", sortable: true },
   { key: "email", title: "Email", sortable: false },
