@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export default function ModalEditGeneric({
   isOpen,
   onClose,
   onSave,
   children,
-  title = 'Cadastro',
+  title = "Cadastro",
 }) {
   if (!isOpen) return null;
 
