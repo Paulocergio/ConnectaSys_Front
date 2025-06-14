@@ -4,6 +4,9 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import Sidebar from "../../components/Sidebar";
 import Table from "../../components/Table/Table";
 import ModalAddGeneric from "../../components/Modals/ModalAddGeneric";
+import ModalEditGeneric from "../../components/Modals/ModalEditGeneric";
+import ModalConfirmDelete from "../../components/Modals/ModalConfirmDelete";
+import { updateSupplier, deleteSupplier } from "../../services/api/supplierService";
 import SuppliersFormFields from "./suppliersFormFields";
 import { createSupplier, getSuppliers } from "../../services/api/supplierService";
 import {
@@ -11,6 +14,8 @@ import {
   showError,
   ToastContainerWrapper,
 } from "../../components/Toast/ToastNotification";
+import { Edit, Trash2 } from "lucide-react";
+
 const initialSupplierData = {
   company_name: "",
   contact_name: "",
@@ -31,6 +36,56 @@ export default function SuppliersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+
+const handleEditClick = (supplier) => {
+  setFormData({
+    id: supplier.id,
+    company_name: supplier.companyName || "",
+    contact_name: supplier.contactName || "",
+    email: supplier.email || "",
+    phone: supplier.phone || "",
+    address: supplier.address || "",
+    city: supplier.city || "",
+    state: supplier.state || "",
+    zip_code: supplier.zipCode || "",
+    country: supplier.country || "",
+    tax_id: supplier.taxId || "",
+    is_active: supplier.isActive ?? true,
+  });
+  setSelectedSupplier(supplier);
+  setIsEditModalOpen(true);
+};
+
+
+  const handleDeleteClick = (supplier) => {
+    setSelectedSupplier(supplier);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleUpdate = async () => {
+    try {
+      await updateSupplier(selectedSupplier.id, formData);
+      await fetchSuppliers();
+      showSuccess("Fornecedor atualizado com sucesso!");
+      setIsEditModalOpen(false);
+    } catch (error) {
+      showError("Erro ao atualizar fornecedor.");
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await deleteSupplier(selectedSupplier.id);
+      await fetchSuppliers();
+      showSuccess("Fornecedor excluído com sucesso!");
+      setIsDeleteModalOpen(false);
+    } catch (error) {
+      showError("Erro ao excluir fornecedor.");
+    }
+  };
 
   const fetchSuppliers = useCallback(async () => {
     try {
@@ -114,6 +169,28 @@ export default function SuppliersPage() {
           </span>
         ),
     },
+   {
+  key: "actions",
+  title: "Ações",
+  render: (_, row) => (
+    <div className="flex items-center gap-3">
+      <button
+        title="Editar"
+        className="text-[#2563eb] hover:opacity-80 transition"
+        onClick={() => handleEditClick(row)}
+      >
+        <Edit size={18} />
+      </button>
+      <button
+        title="Excluir"
+        className="text-[#dc2626] hover:opacity-80 transition"
+        onClick={() => handleDeleteClick(row)}
+      >
+        <Trash2 size={18} />
+      </button>
+    </div>
+  ),
+},
   ];
 
   const memoizedFormFields = useMemo(
@@ -144,6 +221,22 @@ export default function SuppliersPage() {
         >
           {memoizedFormFields}
         </ModalAddGeneric>
+
+        <ModalEditGeneric
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleUpdate}
+          title="Editar Fornecedor"
+        >
+          {memoizedFormFields}
+        </ModalEditGeneric>
+
+        <ModalConfirmDelete
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onConfirm={handleDeleteConfirm}
+          itemName={selectedSupplier?.company_name}
+        />
       </main>
 
       <ToastContainerWrapper />
