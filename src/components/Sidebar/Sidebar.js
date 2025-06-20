@@ -4,13 +4,21 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
+
+
+ import {
+  Users,
+  Package,
+  Truck,
+  UserCheck,
+} from "lucide-react"; 
+
 export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(isCollapsed);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Detectar se é mobile
   useEffect(() => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -22,7 +30,7 @@ export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  // Sincronizar o estado interno com a prop
+
   useEffect(() => {
     if (!isMobile) {
       setCollapsed(isCollapsed);
@@ -30,7 +38,7 @@ export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
     }
   }, [isCollapsed, isMobile]);
 
-  // Toggle para desktop
+
   const handleToggle = () => {
     if (toggleSidebar) {
       toggleSidebar();
@@ -39,105 +47,46 @@ export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
     }
   };
 
-  // Toggle para mobile
+
   const handleMobileToggle = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
-  // Fechar menu mobile ao clicar em link
   const handleLinkClick = () => {
     if (isMobile) {
       setMobileMenuOpen(false);
     }
   };
 
-  // Fechar menu mobile ao clicar fora
+
   const handleOverlayClick = () => {
     setMobileMenuOpen(false);
   };
 
-  const menuItems = [
-    {
-      path: "/customer",
-      label: "Clientes",
-      icon: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-          />
-        </svg>
-      ),
-    },
-    {
-      path: "/suppliers",
-      label: "Fornecedores",
-      icon: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-          />
-        </svg>
-      ),
-    },{
-      path: "/products",
-      label: "Produtos",
-      icon: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-          />
-        </svg>
-      ),
-    },
-    
-    {
-      path: "/Users",
-      label: "Usuários",
-      icon: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-          />
-        </svg>
-      ),
-    },
-  ];
+
+const menuItems = [
+  {
+    path: "/customer",
+    label: "Clientes",
+    icon: <UserCheck className="h-5 w-5" />,
+  },
+  {
+    path: "/suppliers",
+    label: "Fornecedores",
+    icon: <Truck className="h-5 w-5" />,
+  },
+  {
+    path: "/products",
+    label: "Produtos",
+    icon: <Package className="h-5 w-5" />,
+  },
+  {
+    path: "/Users",
+    label: "Usuários",
+    icon: <Users className="h-5 w-5" />,
+  },
+];
+
 
   // Renderização para mobile com dropdown
   if (isMobile) {
