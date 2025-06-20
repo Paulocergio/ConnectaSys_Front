@@ -40,24 +40,24 @@ export default function SuppliersPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
 
-const handleEditClick = (supplier) => {
-  setFormData({
-    id: supplier.id,
-    company_name: supplier.companyName || "",
-    contact_name: supplier.contactName || "",
-    email: supplier.email || "",
-    phone: supplier.phone || "",
-    address: supplier.address || "",
-    city: supplier.city || "",
-    state: supplier.state || "",
-    zip_code: supplier.zipCode || "",
-    country: supplier.country || "",
-    tax_id: supplier.taxId || "",
-    is_active: supplier.isActive ?? true,
-  });
-  setSelectedSupplier(supplier);
-  setIsEditModalOpen(true);
-};
+  const handleEditClick = (supplier) => {
+    setFormData({
+      id: supplier.id,
+      company_name: supplier.companyName || "",
+      contact_name: supplier.contactName || "",
+      email: supplier.email || "",
+      phone: supplier.phone || "",
+      address: supplier.address || "",
+      city: supplier.city || "",
+      state: supplier.state || "",
+      zip_code: supplier.zipCode || "",
+      country: supplier.country || "",
+      tax_id: supplier.taxId || "",
+      is_active: supplier.isActive ?? true,
+    });
+    setSelectedSupplier(supplier);
+    setIsEditModalOpen(true);
+  };
 
 
   const handleDeleteClick = (supplier) => {
@@ -169,28 +169,28 @@ const handleEditClick = (supplier) => {
           </span>
         ),
     },
-   {
-  key: "actions",
-  title: "Ações",
-  render: (_, row) => (
-    <div className="flex items-center gap-3">
-      <button
-        title="Editar"
-        className="text-[#2563eb] hover:opacity-80 transition"
-        onClick={() => handleEditClick(row)}
-      >
-        <Edit size={18} />
-      </button>
-      <button
-        title="Excluir"
-        className="text-[#dc2626] hover:opacity-80 transition"
-        onClick={() => handleDeleteClick(row)}
-      >
-        <Trash2 size={18} />
-      </button>
-    </div>
-  ),
-},
+    {
+      key: "actions",
+      title: "Ações",
+      render: (_, row) => (
+        <div className="flex items-center gap-3">
+          <button
+            title="Editar"
+            className="text-[#2563eb] hover:opacity-80 transition"
+            onClick={() => handleEditClick(row)}
+          >
+            <Edit size={18} />
+          </button>
+          <button
+            title="Excluir"
+            className="text-[#dc2626] hover:opacity-80 transition"
+            onClick={() => handleDeleteClick(row)}
+          >
+            <Trash2 size={18} />
+          </button>
+        </div>
+      ),
+    },
   ];
 
   const memoizedFormFields = useMemo(
