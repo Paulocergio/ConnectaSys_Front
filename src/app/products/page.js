@@ -78,29 +78,37 @@ export default function Products() {
     }));
   };
 
-  const handleSubmit = async () => {
+const handleSubmit = async () => {
   try {
     if (!formData.id) {
       showError("Produto sem ID para edição.");
       return;
     }
 
-    const payload = {
+    console.log("🔧 Atualizando produto com payload:", formData);
+
+    // 🔹 Atualiza o produto
+    await updateProduct(formData.id, {
       productName: formData.product_name,
       barcode: formData.barcode,
       description: formData.description,
+    });
+
+    // 🔹 Atualiza o estoque
+    const stockPayload = {
+      productId: formData.id,
+      quantity: parseInt(formData.quantity ?? 0),
     };
 
-    console.log("📝 Enviando update para:", `/Products/products/${formData.id}`);
-    console.log("📦 Payload:", payload);
+    console.log("📦 Atualizando estoque com:", stockPayload);
+    await createStockEntry(stockPayload);
 
-    await updateProduct(formData.id, payload);
     await fetchProducts();
-    showSuccess("Produto atualizado com sucesso.");
+    showSuccess("Produto e estoque atualizados com sucesso.");
     setIsModalOpen(false);
   } catch (error) {
-    console.error("❌ Erro ao atualizar produto:", error);
-    showError(error?.response?.data?.error || "Erro ao atualizar produto.");
+    console.error("❌ Erro ao atualizar produto e estoque:", error);
+    showError(error?.response?.data?.error || "Erro ao atualizar produto e estoque.");
   }
 };
 
