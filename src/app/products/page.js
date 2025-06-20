@@ -6,11 +6,20 @@ import Table from "../../components/Table/Table";
 import ModalAddGeneric from "../../components/Modals/ModalAddGeneric";
 import ModalEditGeneric from "../../components/Modals/ModalEditGeneric";
 import ConfirmDeleteModal from "../../components/Modals/ModalConfirmDelete";
-//import ToastContainerWrapper, { showError, showSuccess } from "../../components/Toast";
-// ✅ mantenha só esta linha — caminho relativo correto ao arquivo services/products.js
+
+import {
+  showSuccess,
+  showError,
+  ToastContainerWrapper,
+}
+  from "../../components/Toast/ToastNotification";
+
+
 
 import { getAllProducts } from "../../services/api/products";
-import { createProduct, updateProduct, deleteProduct } from "../../services/api/products";
+import { createProduct, updateProduct, deleteProduct, createStockEntry } from "../../services/api/products";
+import ProductFormFields from "../products/productsFormFields";
+
 
 import { Edit, Trash2 } from "lucide-react";
 
@@ -84,22 +93,44 @@ export default function Products() {
       showError(error?.response?.data?.error || "Erro ao atualizar produto.");
     }
   };
-
   const handleSave = async () => {
     try {
+      console.log("🚀 Início do handleSave");
+      console.log("📦 Dados do formData:", formData);
+
       if (!formData.product_name || !formData.barcode) {
         showError("Preencha os campos obrigatórios: Nome e Código de Barras.");
         return;
       }
 
+      const productPayload = {
+        productName: formData.product_name,
+        barcode: formData.barcode,
+        description: formData.description,
+      };
 
-      await createProduct(formData);
+      console.log("📤 Enviando para /Products/products:", productPayload);
+      const res = await createProduct(productPayload);
+      const createdProduct = res.data;
+
+      console.log("✅ Produto criado:", createdProduct);
+
+      const stockPayload = {
+        productId: createdProduct.product_id,
+        quantity: Number(formData.quantity) || 0,
+      };
+
+      console.log("📤 Enviando para /Stock/entries:", stockPayload);
+      await createStockEntry(stockPayload);
+
       await fetchProducts();
       setIsAddModalOpen(false);
       setFormData(initialProductData);
-      showSuccess("Produto adicionado com sucesso.");
+      showSuccess("Produto e estoque cadastrados com sucesso.");
     } catch (error) {
-      showError(error?.response?.data?.error || "Erro ao adicionar produto.");
+      console.error("❌ Erro ao salvar produto/estoque:", error);
+      console.log("📄 Resposta do erro:", error?.response?.data);
+      showError(error?.response?.data?.error || "Erro ao cadastrar produto.");
     }
   };
 
@@ -196,7 +227,6 @@ export default function Products() {
           onAddClick={handleAddClick}
         />
       </main>
-
       {isAddModalOpen && (
         <ModalAddGeneric
           isOpen={isAddModalOpen}
@@ -204,9 +234,10 @@ export default function Products() {
           onSave={handleSave}
           title="Adicionar Produto"
         >
-         
+          <ProductFormFields formData={formData} onChange={handleChange} />
         </ModalAddGeneric>
       )}
+
 
       <ModalEditGeneric
         isOpen={isModalOpen}

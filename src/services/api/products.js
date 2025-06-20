@@ -20,4 +20,19 @@ return await api.get("/Products/products");
   }
 }
 
+export async function createProduct(payload) {
+  return await api.post("/Products/products", payload);
+}
 
+export async function createStockEntry(payload) {
+  return await api.post("/Stock/entries", payload);
+}
+
+
+export async function updateProduct(id, payload) {
+  return await api.put(`/Products/products/${id}`, payload);
+}
+
+export async function deleteProduct(id) {
+  return await api.delete(`/Products/products/${id}`);
+}

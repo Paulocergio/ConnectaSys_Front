@@ -1,17 +1,17 @@
 "use client";
 
 import { memo } from "react";
-import { Package, ScanBarcode, FileText } from "lucide-react";
+import { Package, ScanBarcode, FileText, Hash } from "lucide-react";
 
 const InputField = memo(
-  ({ label, name, icon, value, onChange, required, errorMessage, maxLength }) => {
+  ({ label, name, icon, value, onChange, required, errorMessage, maxLength, type = "text" }) => {
     return (
       <div className="mb-4">
         <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
           {icon} {label} {required && "*"}
         </label>
         <input
-          type="text"
+          type={type}
           name={name}
           value={value ?? ""}
           onChange={onChange}
@@ -30,9 +30,9 @@ const ProductFormFields = memo(({ formData, onChange }) => {
     <>
       <InputField
         label="Nome do Produto"
-        name="productName"
+        name="product_name"
         icon={<Package size={18} />}
-        value={formData.productName}
+        value={formData.product_name}
         onChange={onChange}
         required
       />
@@ -50,6 +50,15 @@ const ProductFormFields = memo(({ formData, onChange }) => {
         icon={<FileText size={18} />}
         value={formData.description}
         onChange={onChange}
+      />
+      <InputField
+        label="Quantidade Inicial"
+        name="quantity"
+        icon={<Hash size={18} />}
+        value={formData.quantity}
+        onChange={onChange}
+        type="number"
+        required
       />
     </>
   );
