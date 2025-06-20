@@ -28,7 +28,6 @@ export async function createStockEntry(payload) {
   return await api.post("/Stock/entries", payload);
 }
 
-
 export async function updateProduct(id, payload) {
   return await api.put(`/Products/products/${id}`, payload);
 }

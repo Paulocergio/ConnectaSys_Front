@@ -79,20 +79,31 @@ export default function Products() {
   };
 
   const handleSubmit = async () => {
-    try {
-      if (!formData.id) {
-        showError("Produto sem ID para edição.");
-        return;
-      }
-
-      await updateProduct(formData.id, formData);
-      await fetchProducts();
-      showSuccess("Produto atualizado com sucesso.");
-      setIsModalOpen(false);
-    } catch (error) {
-      showError(error?.response?.data?.error || "Erro ao atualizar produto.");
+  try {
+    if (!formData.id) {
+      showError("Produto sem ID para edição.");
+      return;
     }
-  };
+
+    const payload = {
+      productName: formData.product_name,
+      barcode: formData.barcode,
+      description: formData.description,
+    };
+
+    console.log("📝 Enviando update para:", `/Products/products/${formData.id}`);
+    console.log("📦 Payload:", payload);
+
+    await updateProduct(formData.id, payload);
+    await fetchProducts();
+    showSuccess("Produto atualizado com sucesso.");
+    setIsModalOpen(false);
+  } catch (error) {
+    console.error("❌ Erro ao atualizar produto:", error);
+    showError(error?.response?.data?.error || "Erro ao atualizar produto.");
+  }
+};
+
   const handleSave = async () => {
     try {
       console.log("🚀 Início do handleSave");
@@ -239,16 +250,17 @@ export default function Products() {
       )}
 
 
-      <ModalEditGeneric
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        formData={formData}
-        onChange={handleChange}
-        onSave={handleSubmit}
-        title="Editar Produto"
-      >
+    <ModalEditGeneric
+  isOpen={isModalOpen}
+  onClose={() => setIsModalOpen(false)}
+  title="Editar Produto"
+  formData={formData}
+  onChange={handleChange}
+  onSave={handleSubmit}
+>
+  <ProductFormFields formData={formData} onChange={handleChange} />
+</ModalEditGeneric>
 
-      </ModalEditGeneric>
 
 
 
