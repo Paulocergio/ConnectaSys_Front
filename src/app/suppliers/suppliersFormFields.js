@@ -1,12 +1,20 @@
 "use client";
 import { memo, useState, useRef, useCallback } from "react";
-import { User, Mail, Phone, Building, MapPin, Building2 ,MapPinHouse ,MapPinned ,Globe} from "lucide-react";
+import { User, Mail, Phone, Building, MapPin, Building2 ,MapPinHouse ,MapPinned ,Globe } from "lucide-react";
 import { debounce } from "lodash";
 import { fetchCnpjData } from "../../services/api/cnpjService";
 import { formatDocument, validateDocumentLength } from "../suppliers/documentFormatter";
 
+// Campos que não terão uppercase
+const noUppercase = ["email", "phone", "tax_id", "zip_code"];
+
 const InputField = memo(
   ({ label, name, icon, value, onChange, onInput, type, required, errorMessage, maxLength }) => {
+    const displayValue =
+      value && !noUppercase.includes(name)
+        ? value.toUpperCase()
+        : value ?? "";
+
     return (
       <div className="mb-4">
         <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
@@ -15,7 +23,7 @@ const InputField = memo(
         <input
           type={type}
           name={name}
-          value={value ?? ""}
+          value={displayValue}
           onChange={onChange}
           onInput={onInput}
           required={required}
@@ -60,7 +68,6 @@ const SuppliersFormFields = memo(({ formData, onChange, onFill }) => {
       lastDocRef.current = doc;
 
       if (doc.length === 14) {
-        // CNPJ
         try {
           const data = await fetchCnpjData(doc);
           const est = data.estabelecimento;
@@ -82,7 +89,6 @@ const SuppliersFormFields = memo(({ formData, onChange, onFill }) => {
           setDocError("⚠️ API de CNPJ indisponível. Preencha os dados manualmente.");
         }
       } else if (doc.length === 11) {
-        // CPF
         setDocError("");
         onFill({
           tax_id: formatDocument(doc),
@@ -152,10 +158,34 @@ const SuppliersFormFields = memo(({ formData, onChange, onFill }) => {
         value={formData.address}
         onChange={onChange}
       />
-      <InputField label="Cidade" name="city" value={formData.city} onChange={onChange} icon={<Building2 />}/>
-      <InputField label="Estado" name="state" value={formData.state} onChange={onChange} icon={<MapPinHouse  />}/>
-      <InputField label="CEP" name="zip_code" value={formData.zip_code} onChange={onChange} icon={<MapPinned />}/>
-      <InputField label="País" name="country" value={formData.country} onChange={onChange} icon={<Globe/>}/>
+      <InputField
+        label="Cidade"
+        name="city"
+        value={formData.city}
+        onChange={onChange}
+        icon={<Building2 />}
+      />
+      <InputField
+        label="Estado"
+        name="state"
+        value={formData.state}
+        onChange={onChange}
+        icon={<MapPinHouse />}
+      />
+      <InputField
+        label="CEP"
+        name="zip_code"
+        value={formData.zip_code}
+        onChange={onChange}
+        icon={<MapPinned />}
+      />
+      <InputField
+        label="País"
+        name="country"
+        value={formData.country}
+        onChange={onChange}
+        icon={<Globe />}
+      />
     </>
   );
 });
