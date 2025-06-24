@@ -144,54 +144,105 @@ const handleEditClick = (supplier) => {
     }
   };
 
-  const columns = [
-    { key: "companyName", title: "Empresa", sortable: true },
-    { key: "contactName", title: "Contato", sortable: true },
-    { key: "email", title: "Email", sortable: false },
-    { key: "phone", title: "Telefone", sortable: false },
-    { key: "address", title: "Endereço", sortable: false },
-    { key: "city", title: "Cidade", sortable: false },
-    { key: "state", title: "Estado", sortable: false },
-    { key: "zipCode", title: "CEP", sortable: false },
-    { key: "country", title: "País", sortable: false },
-    { key: "taxId", title: "CNPJ/CPF", sortable: false },
-    {
-      key: "isActive",
-      title: "Status",
-      render: (value) =>
-        value ? (
-          <span className="bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold">
-            ATIVO
-          </span>
-        ) : (
-          <span className="bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">
-            INATIVO
-          </span>
-        ),
-    },
-   {
-  key: "actions",
-  title: "Ações",
-  render: (_, row) => (
-    <div className="flex items-center gap-3">
-      <button
-        title="Editar"
-        className="text-[#2563eb] hover:opacity-80 transition"
-        onClick={() => handleEditClick(row)}
-      >
-        <Edit size={18} />
-      </button>
-      <button
-        title="Excluir"
-        className="text-[#dc2626] hover:opacity-80 transition"
-        onClick={() => handleDeleteClick(row)}
-      >
-        <Trash2 size={18} />
-      </button>
-    </div>
-  ),
-},
-  ];
+const columns = [
+  {
+    key: "companyName",
+    title: "Empresa",
+    sortable: true,
+    render: (value) => String(value).toUpperCase(),
+  },
+  {
+    key: "contactName",
+    title: "Contato",
+    sortable: true,
+    render: (value) => String(value).toUpperCase(),
+  },
+  {
+    key: "email",
+    title: "Email",
+    sortable: false,
+    render: (value) => String(value).toUpperCase(),
+  },
+  {
+    key: "phone",
+    title: "Telefone",
+    sortable: false,
+    render: (value) => String(value).toUpperCase(),
+  },
+  {
+    key: "address",
+    title: "Endereço",
+    sortable: false,
+    render: (value) => String(value).toUpperCase(),
+  },
+  {
+    key: "city",
+    title: "Cidade",
+    sortable: false,
+    render: (value) => String(value).toUpperCase(),
+  },
+  {
+    key: "state",
+    title: "Estado",
+    sortable: false,
+    render: (value) => String(value).toUpperCase(),
+  },
+  {
+    key: "zipCode",
+    title: "CEP",
+    sortable: false,
+    render: (value) => String(value).toUpperCase(),
+  },
+  {
+    key: "country",
+    title: "País",
+    sortable: false,
+    render: (value) => String(value).toUpperCase(),
+  },
+  {
+    key: "taxId",
+    title: "CNPJ/CPF",
+    sortable: false,
+    render: (value) => String(value).toUpperCase(),
+  },
+  {
+    key: "isActive",
+    title: "Status",
+    render: (value) =>
+      value ? (
+        <span className="bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold">
+          ATIVO
+        </span>
+      ) : (
+        <span className="bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">
+          INATIVO
+        </span>
+      ),
+  },
+  {
+    key: "actions",
+    title: "Ações",
+    render: (_, row) => (
+      <div className="flex items-center gap-3">
+        <button
+          title="Editar"
+          className="text-[#2563eb] hover:opacity-80 transition"
+          onClick={() => handleEditClick(row)}
+        >
+          <Edit size={18} />
+        </button>
+        <button
+          title="Excluir"
+          className="text-[#dc2626] hover:opacity-80 transition"
+          onClick={() => handleDeleteClick(row)}
+        >
+          <Trash2 size={18} />
+        </button>
+      </div>
+    ),
+  },
+];
+
 
   const memoizedFormFields = useMemo(
     () => <SuppliersFormFields formData={formData} onChange={handleChange} onFill={handleFill} />,

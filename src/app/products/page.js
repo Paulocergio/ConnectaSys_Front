@@ -178,109 +178,94 @@ export default function Products() {
       setItemToDelete(null);
     }
   };
-
-  const columns = [
-    {
-      key: "product_name",
-      title: "Produto",
-      sortable: true,
-      render: (_, p) => p.product_name,
-    },
-    {
-      key: "barcode",
-      title: "Código de Barras",
-      sortable: true,
-      render: (_, p) => p.barcode || "NÃO INFORMADO",
-    },
-    {
-      key: "description",
-      title: "Descrição",
-      sortable: false,
-      render: (_, p) => p.description || "—",
-    },
-    {
-      key: "quantity",
-      title: "Estoque",
-      sortable: true,
-      render: (_, p) => `${p.quantity ?? 0} un.`,
-    },
-    {
-      key: "cost_price",
-      title: "Preço de Custo (R$)",
-      sortable: true,
-      render: (_, p) =>
-        p.cost_price !== undefined && p.cost_price !== null
-          ? `R$ ${Number(p.cost_price).toFixed(2)}`
-          : "—",
-    },
-    {
-      key: "sale_price",
-      title: "Preço de Venda (R$)",
-      sortable: true,
-      render: (_, p) =>
-        p.sale_price !== undefined && p.sale_price !== null
-          ? `R$ ${Number(p.sale_price).toFixed(2)}`
-          : "—",
-    },
-    {
-      key: "profit_margin",
-      title: "Margem Lucro (%)",
-      sortable: true,
-      render: (_, p) =>
-        p.profit_margin !== undefined && p.profit_margin !== null ? (
-          <span
-            className={`font-medium ${Number(p.profit_margin) >= 0 ? "text-green-600" : "text-red-600"
-              }`}
-          >
-            {Number(p.profit_margin).toFixed(2)}%
-          </span>
-        ) : (
-          "—"
-        ),
-    },
-
-
-
-    // {
-    //   key: "created_at",
-    //   title: "Criado em",
-    //   sortable: true,
-    //   render: (_, p) =>
-    //     new Date(p.created_at).toLocaleDateString("pt-BR", {
-    //       day: "2-digit",
-    //       month: "2-digit",
-    //       year: "numeric",
-    //       hour: "2-digit",
-    //       minute: "2-digit",
-    //     }),
-    // },
-    {
-      key: "actions",
-      title: "Ações",
-      sortable: false,
-      render: (_, p) => (
-        <div className="flex gap-3">
-          <button
-            onClick={() => handleEditClick(p)}
-            className="text-blue-600 hover:text-blue-800 transition-colors"
-            title="Editar produto"
-          >
-            <Edit size={16} />
-          </button>
-          <button
-            onClick={() => {
-              setItemToDelete(p);
-              setIsDeleteModalOpen(true);
-            }}
-            className="text-red-600 hover:text-red-800 transition-colors"
-            title="Excluir produto"
-          >
-            <Trash2 size={16} />
-          </button>
-        </div>
+const columns = [
+  {
+    key: "product_name",
+    title: "Produto",
+    sortable: true,
+    render: (_, p) => String(p.product_name).toUpperCase(),
+  },
+  {
+    key: "barcode",
+    title: "Código de Barras",
+    sortable: true,
+    render: (_, p) => (p.barcode ? String(p.barcode).toUpperCase() : "NÃO INFORMADO"),
+  },
+  {
+    key: "description",
+    title: "Descrição",
+    sortable: false,
+    render: (_, p) => (p.description ? String(p.description).toUpperCase() : "—"),
+  },
+  {
+    key: "quantity",
+    title: "Estoque",
+    sortable: true,
+    render: (_, p) => `${p.quantity ?? 0} un.`,
+  },
+  {
+    key: "cost_price",
+    title: "Preço de Custo (R$)",
+    sortable: true,
+    render: (_, p) =>
+      p.cost_price !== undefined && p.cost_price !== null
+        ? `R$ ${Number(p.cost_price).toFixed(2)}`
+        : "—",
+  },
+  {
+    key: "sale_price",
+    title: "Preço de Venda (R$)",
+    sortable: true,
+    render: (_, p) =>
+      p.sale_price !== undefined && p.sale_price !== null
+        ? `R$ ${Number(p.sale_price).toFixed(2)}`
+        : "—",
+  },
+  {
+    key: "profit_margin",
+    title: "Margem Lucro (%)",
+    sortable: true,
+    render: (_, p) =>
+      p.profit_margin !== undefined && p.profit_margin !== null ? (
+        <span
+          className={`font-medium ${
+            Number(p.profit_margin) >= 0 ? "text-green-600" : "text-red-600"
+          }`}
+        >
+          {Number(p.profit_margin).toFixed(2)}%
+        </span>
+      ) : (
+        "—"
       ),
-    },
-  ];
+  },
+  {
+    key: "actions",
+    title: "Ações",
+    sortable: false,
+    render: (_, p) => (
+      <div className="flex gap-3">
+        <button
+          onClick={() => handleEditClick(p)}
+          className="text-blue-600 hover:text-blue-800 transition-colors"
+          title="Editar produto"
+        >
+          <Edit size={16} />
+        </button>
+        <button
+          onClick={() => {
+            setItemToDelete(p);
+            setIsDeleteModalOpen(true);
+          }}
+          className="text-red-600 hover:text-red-800 transition-colors"
+          title="Excluir produto"
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
+    ),
+  },
+];
+
 
 
 
