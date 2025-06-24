@@ -25,7 +25,16 @@ const InputField = memo(
   }
 );
 
+
+
+
+
 const ProductFormFields = memo(({ formData, onChange }) => {
+  const calculatedMargin =
+    formData.cost_price && formData.sale_price
+      ? (((formData.sale_price - formData.cost_price) / formData.cost_price) * 100).toFixed(2)
+      : null;
+
   return (
     <>
       <InputField
@@ -60,7 +69,30 @@ const ProductFormFields = memo(({ formData, onChange }) => {
         type="number"
         required
       />
+
+
+      <InputField
+        label="Preço de Custo (R$) *"
+        name="cost_price"
+        icon={<Package size={18} />}
+        value={formData.cost_price}
+        onChange={onChange}
+        type="number"
+        step="0.01"
+      />
+      <InputField
+        label="Preço de Venda (R$) *"
+        name="sale_price"
+        icon={<Package size={18} />}
+        value={formData.sale_price}
+        onChange={onChange}
+        type="number"
+        step="0.01"
+      />
+      
+
     </>
+    
   );
 });
 
