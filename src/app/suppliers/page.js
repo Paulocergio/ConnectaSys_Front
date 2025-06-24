@@ -286,7 +286,11 @@ const columns = [
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirm={handleDeleteConfirm}
-          itemName={selectedSupplier?.company_name}
+        itemName={selectedSupplier?.companyName}
+
+
+          
+          
         />
       </main>
 
