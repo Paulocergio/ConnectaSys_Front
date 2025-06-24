@@ -3,8 +3,16 @@
 import { memo } from "react";
 import { Package, ScanBarcode, FileText, Hash } from "lucide-react";
 
+// Campos que NÃO devem ser forçados para uppercase
+const noUppercase = ["quantity", "cost_price", "sale_price"];
+
 const InputField = memo(
-  ({ label, name, icon, value, onChange, required, errorMessage, maxLength, type = "text" }) => {
+  ({ label, name, icon, value, onChange, required, errorMessage, maxLength, type = "text", step }) => {
+    const displayValue =
+      value && !noUppercase.includes(name)
+        ? String(value).toUpperCase()
+        : value ?? "";
+
     return (
       <div className="mb-4">
         <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
@@ -13,10 +21,11 @@ const InputField = memo(
         <input
           type={type}
           name={name}
-          value={value ?? ""}
+          value={displayValue}
           onChange={onChange}
           required={required}
           maxLength={maxLength}
+          step={step}
           className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         {errorMessage && <p className="text-sm text-red-600 mt-1">{errorMessage}</p>}
@@ -24,10 +33,6 @@ const InputField = memo(
     );
   }
 );
-
-
-
-
 
 const ProductFormFields = memo(({ formData, onChange }) => {
   const calculatedMargin =
@@ -69,8 +74,6 @@ const ProductFormFields = memo(({ formData, onChange }) => {
         type="number"
         required
       />
-
-
       <InputField
         label="Preço de Custo (R$) *"
         name="cost_price"
@@ -89,10 +92,7 @@ const ProductFormFields = memo(({ formData, onChange }) => {
         type="number"
         step="0.01"
       />
-      
-
     </>
-    
   );
 });
 
