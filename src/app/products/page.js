@@ -13,21 +13,17 @@ import {
   ToastContainerWrapper,
 }
   from "../../components/Toast/ToastNotification";
-
-
-
 import { getAllProducts } from "../../services/api/products";
 import { createProduct, updateProduct, deleteProduct, createStockEntry } from "../../services/api/products";
 import ProductFormFields from "../products/productsFormFields";
-
-
 import { Edit, Trash2 } from "lucide-react";
-
 const initialProductData = {
   product_name: "",
   barcode: "",
   description: "",
   quantity: 0,
+  cost_price: 0,
+  sale_price: 0,
 };
 
 
@@ -72,45 +68,58 @@ export default function Products() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+
+    let parsedValue = value;
+
+    // Verifica se o campo é numérico
+    const numericFields = ["quantity", "cost_price", "sale_price"];
+    if (numericFields.includes(name)) {
+      // Converte vírgula para ponto, depois para float
+      parsedValue = parseFloat(value.replace(",", "."));
+      if (isNaN(parsedValue)) parsedValue = "";
+    }
+
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : parsedValue,
     }));
   };
 
-const handleSubmit = async () => {
-  try {
-    if (!formData.id) {
-      showError("Produto sem ID para edição.");
-      return;
+  const handleSubmit = async () => {
+    try {
+      if (!formData.id) {
+        showError("Produto sem ID para edição.");
+        return;
+      }
+
+      console.log("🔧 Atualizando produto com payload:", formData);
+
+      // 🔹 Atualiza o produto
+     await updateProduct(formData.id, {
+  product_name: formData.product_name,
+  barcode: formData.barcode,
+  description: formData.description,
+  cost_price: parseFloat(formData.cost_price),
+  sale_price: parseFloat(formData.sale_price),
+});
+
+      // 🔹 Atualiza o estoque
+      const stockPayload = {
+        productId: formData.id,
+        quantity: parseInt(formData.quantity ?? 0),
+      };
+
+      console.log("📦 Atualizando estoque com:", stockPayload);
+      await createStockEntry(stockPayload);
+
+      await fetchProducts();
+      showSuccess("Produto e estoque atualizados com sucesso.");
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("❌ Erro ao atualizar produto e estoque:", error);
+      showError(error?.response?.data?.error || "Erro ao atualizar produto e estoque.");
     }
-
-    console.log("🔧 Atualizando produto com payload:", formData);
-
-    // 🔹 Atualiza o produto
-    await updateProduct(formData.id, {
-      productName: formData.product_name,
-      barcode: formData.barcode,
-      description: formData.description,
-    });
-
-    // 🔹 Atualiza o estoque
-    const stockPayload = {
-      productId: formData.id,
-      quantity: parseInt(formData.quantity ?? 0),
-    };
-
-    console.log("📦 Atualizando estoque com:", stockPayload);
-    await createStockEntry(stockPayload);
-
-    await fetchProducts();
-    showSuccess("Produto e estoque atualizados com sucesso.");
-    setIsModalOpen(false);
-  } catch (error) {
-    console.error("❌ Erro ao atualizar produto e estoque:", error);
-    showError(error?.response?.data?.error || "Erro ao atualizar produto e estoque.");
-  }
-};
+  };
 
   const handleSave = async () => {
     try {
@@ -123,10 +132,13 @@ const handleSubmit = async () => {
       }
 
       const productPayload = {
-        productName: formData.product_name,
+        product_name: formData.product_name,
         barcode: formData.barcode,
         description: formData.description,
+        cost_price: formData.cost_price,
+        sale_price: formData.sale_price,
       };
+
 
       console.log("📤 Enviando para /Products/products:", productPayload);
       const res = await createProduct(productPayload);
@@ -147,10 +159,11 @@ const handleSubmit = async () => {
       setFormData(initialProductData);
       showSuccess("Produto e estoque cadastrados com sucesso.");
     } catch (error) {
-      console.error("❌ Erro ao salvar produto/estoque:", error);
+      console.error("❌ Erro ao salvar produto:", error);
       console.log("📄 Resposta do erro:", error?.response?.data);
       showError(error?.response?.data?.error || "Erro ao cadastrar produto.");
     }
+
   };
 
   const confirmDelete = async () => {
@@ -192,18 +205,55 @@ const handleSubmit = async () => {
       render: (_, p) => `${p.quantity ?? 0} un.`,
     },
     {
-      key: "created_at",
-      title: "Criado em",
+      key: "cost_price",
+      title: "Preço de Custo (R$)",
       sortable: true,
       render: (_, p) =>
-        new Date(p.created_at).toLocaleDateString("pt-BR", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
+        p.cost_price !== undefined && p.cost_price !== null
+          ? `R$ ${Number(p.cost_price).toFixed(2)}`
+          : "—",
     },
+    {
+      key: "sale_price",
+      title: "Preço de Venda (R$)",
+      sortable: true,
+      render: (_, p) =>
+        p.sale_price !== undefined && p.sale_price !== null
+          ? `R$ ${Number(p.sale_price).toFixed(2)}`
+          : "—",
+    },
+    {
+      key: "profit_margin",
+      title: "Margem Lucro (%)",
+      sortable: true,
+      render: (_, p) =>
+        p.profit_margin !== undefined && p.profit_margin !== null ? (
+          <span
+            className={`font-medium ${Number(p.profit_margin) >= 0 ? "text-green-600" : "text-red-600"
+              }`}
+          >
+            {Number(p.profit_margin).toFixed(2)}%
+          </span>
+        ) : (
+          "—"
+        ),
+    },
+
+
+
+    // {
+    //   key: "created_at",
+    //   title: "Criado em",
+    //   sortable: true,
+    //   render: (_, p) =>
+    //     new Date(p.created_at).toLocaleDateString("pt-BR", {
+    //       day: "2-digit",
+    //       month: "2-digit",
+    //       year: "numeric",
+    //       hour: "2-digit",
+    //       minute: "2-digit",
+    //     }),
+    // },
     {
       key: "actions",
       title: "Ações",
@@ -233,6 +283,7 @@ const handleSubmit = async () => {
   ];
 
 
+
   return (
     <div className="flex h-screen">
       <Sidebar isCollapsed={isSidebarCollapsed} toggleSidebar={toggleSidebar} />
@@ -258,16 +309,16 @@ const handleSubmit = async () => {
       )}
 
 
-    <ModalEditGeneric
-  isOpen={isModalOpen}
-  onClose={() => setIsModalOpen(false)}
-  title="Editar Produto"
-  formData={formData}
-  onChange={handleChange}
-  onSave={handleSubmit}
->
-  <ProductFormFields formData={formData} onChange={handleChange} />
-</ModalEditGeneric>
+      <ModalEditGeneric
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Editar Produto"
+        formData={formData}
+        onChange={handleChange}
+        onSave={handleSubmit}
+      >
+        <ProductFormFields formData={formData} onChange={handleChange} />
+      </ModalEditGeneric>
 
 
 
