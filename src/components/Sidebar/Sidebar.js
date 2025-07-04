@@ -203,16 +203,16 @@ export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
     );
   }
 
-  // Renderização para desktop
+
   return (
     <div
       className={`h-full bg-gradient-to-b from-slate-50 to-white border-r border-slate-200/60 shadow transition-all duration-200 ease-out ${
         collapsed ? "w-14" : "w-44"
       }`}
     >
-      {/* Header do Sidebar desktop */}
+     
       <div className="flex items-center px-2 py-3 border-b border-slate-200/40">
-        {/* Logo e título - só aparecem quando não collapsed */}
+     
         {!collapsed && (
           <div className="flex items-center flex-1">
             <div className="relative">
@@ -239,7 +239,7 @@ export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
           </div>
         )}
 
-        {/* Botão de toggle desktop - sempre visível */}
+ 
         <button
           onClick={handleToggle}
           className={`group p-1 text-slate-500 hover:text-blue-600 focus:outline-none transition-all duration-200 rounded-lg hover:bg-blue-50 ${
@@ -280,7 +280,7 @@ export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
         </button>
       </div>
 
-      {/* Menu desktop */}
+
       <nav className="mt-3 px-1">
         <ul className="space-y-1">
           {menuItems.map((item, index) => {
@@ -305,7 +305,7 @@ export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
                     isActive ? "text-white scale-110" : "text-slate-500 group-hover:text-blue-500 group-hover:scale-110"
                   }`}>
                     {item.icon &&
-                      // Reduzir tamanho do ícone
+                   
                       <span className="inline-flex items-center justify-center h-4 w-4">
                         {item.icon}
                       </span>
