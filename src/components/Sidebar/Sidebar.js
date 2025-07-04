@@ -206,23 +206,23 @@ export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
   // Renderização para desktop
   return (
     <div
-      className={`h-full bg-gradient-to-b from-slate-50 to-white border-r border-slate-200/60 shadow-xl transition-all duration-500 ease-out ${
-        collapsed ? "w-30" : "w-54"
+      className={`h-full bg-gradient-to-b from-slate-50 to-white border-r border-slate-200/60 shadow transition-all duration-200 ease-out ${
+        collapsed ? "w-14" : "w-44"
       }`}
     >
       {/* Header do Sidebar desktop */}
-      <div className="flex items-center px-4 py-5 border-b border-slate-200/50">
+      <div className="flex items-center px-2 py-3 border-b border-slate-200/40">
         {/* Logo e título - só aparecem quando não collapsed */}
         {!collapsed && (
           <div className="flex items-center flex-1">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl blur-sm opacity-75"></div>
-              <div className="relative bg-gradient-to-r from-blue-600 to-cyan-500 p-3 rounded-2xl shadow-lg">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-xl blur-sm opacity-60"></div>
+              <div className="relative bg-gradient-to-r from-blue-500 to-cyan-400 p-2 rounded-xl shadow">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="white"
-                  className="w-6 h-6"
+                  className="w-5 h-5"
                 >
                   <path
                     fillRule="evenodd"
@@ -233,7 +233,7 @@ export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
                 </svg>
               </div>
             </div>
-            <h1 className="ml-3 text-lg font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+            <h1 className="ml-2 text-base font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
               ConnectaSys
             </h1>
           </div>
@@ -242,14 +242,14 @@ export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
         {/* Botão de toggle desktop - sempre visível */}
         <button
           onClick={handleToggle}
-          className={`group p-2 text-slate-500 hover:text-blue-600 focus:outline-none transition-all duration-300 rounded-xl hover:bg-blue-50 ${
+          className={`group p-1 text-slate-500 hover:text-blue-600 focus:outline-none transition-all duration-200 rounded-lg hover:bg-blue-50 ${
             collapsed ? "mx-auto" : "ml-auto"
           }`}
         >
           {collapsed ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 transform group-hover:scale-110 transition-transform duration-300"
+              className="h-4 w-4 transform group-hover:scale-110 transition-transform duration-200"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -264,7 +264,7 @@ export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
           ) : (
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 transform group-hover:scale-110 transition-transform duration-300"
+              className="h-4 w-4 transform group-hover:scale-110 transition-transform duration-200"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -281,36 +281,41 @@ export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
       </div>
 
       {/* Menu desktop */}
-      <nav className="mt-6 px-3">
-        <ul className="space-y-2">
+      <nav className="mt-3 px-1">
+        <ul className="space-y-1">
           {menuItems.map((item, index) => {
             const isActive = pathname === item.path;
             return (
-              <li key={item.path} className={`transform transition-all duration-300 delay-${index * 50}`}>
+              <li key={item.path} className={`transform transition-all duration-200 delay-${index * 50}`}>
                 <Link
                   href={item.path}
                   className={`group flex items-center ${
-                    collapsed ? "justify-center px-3" : "px-3"
-                  } py-3 text-sm rounded-xl transition-all duration-300 relative overflow-hidden ${
+                    collapsed ? "justify-center px-2" : "px-2"
+                  } py-2 text-xs rounded-lg transition-all duration-200 relative overflow-hidden ${
                     isActive
-                      ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-500/25 scale-105"
-                      : "text-slate-700 hover:bg-white hover:text-blue-600 hover:shadow-md hover:-translate-y-0.5 hover:scale-105"
+                      ? "bg-blue-500 text-white shadow-md scale-105"
+                      : "text-slate-700 hover:bg-slate-100 hover:text-blue-600 hover:shadow-sm hover:scale-105"
                   }`}
                   title={collapsed ? item.label : ""}
                 >
                   {isActive && !collapsed && (
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-white rounded-r-full"></div>
                   )}
-                  <span className={`transition-all duration-300 ${
+                  <span className={`transition-all duration-200 ${
                     isActive ? "text-white scale-110" : "text-slate-500 group-hover:text-blue-500 group-hover:scale-110"
                   }`}>
-                    {item.icon}
+                    {item.icon &&
+                      // Reduzir tamanho do ícone
+                      <span className="inline-flex items-center justify-center h-4 w-4">
+                        {item.icon}
+                      </span>
+                    }
                   </span>
                   {!collapsed && (
-                    <span className="ml-3 font-semibold tracking-wide">{item.label}</span>
+                    <span className="ml-2 font-medium tracking-wide">{item.label}</span>
                   )}
                   {isActive && collapsed && (
-                    <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-white rounded-l-full"></div>
+                    <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-white rounded-l-full"></div>
                   )}
                 </Link>
               </li>
