@@ -1,0 +1,18 @@
+services:
+  frontend:
+    image: paulocergio/connectasys-frontend:latest
+    container_name: frontend
+    networks:
+      - web
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.frontend.rule: Host(`frontend.connectasys.com.br`)
+      traefik.http.routers.frontend.entrypoints: web
+      traefik.http.services.frontend.loadbalancer.server.port: "80"
+
+networks:
+  web:
+    external: true
+
+
+MhffHJ@123234)k&&  senha dockage

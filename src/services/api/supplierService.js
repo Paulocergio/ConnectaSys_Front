@@ -1,8 +1,5 @@
-import axios from "axios";
+import api from "./axiosInstance.js";
 
-const api = axios.create({
-  baseURL: "http://localhost:3000/api/v1",
-});
 
 // 🔧 Função utilitária para extrair mensagens de erro
 function extractErrorMessage(error, fallbackMessage) {

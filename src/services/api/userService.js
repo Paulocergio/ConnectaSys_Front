@@ -1,9 +1,6 @@
 // src/services/api/userService.js
-import axios from "axios";
+import api from "./axiosInstance.js";
 
-const api = axios.create({
-  baseURL: "http://localhost:3000/api/v1",
-});
 
 export async function getUsers() {
   const response = await api.get("/Users");

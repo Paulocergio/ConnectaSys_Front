@@ -2,12 +2,13 @@
   "name": "connectasys",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
+"scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "export": "next export"
+}
+,
   "dependencies": {
     "@headlessui/react": "^2.2.4",
     "axios": "^1.9.0",
