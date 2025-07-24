@@ -1,0 +1,5 @@
+node_modules
+build
+.dockerignore
+Dockerfile
+docker build -t seu-usuario/connectasys-frontend:latest .
