@@ -1,14 +1,16 @@
 "use client";
 
-import { login } from "./actions";
+
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { login } from "../../services/api/login"; // Ajuste o caminho conforme necessário 
+
 
 export default function LoginForm() {
   const router = useRouter();
-  const [form, setForm] = useState({ email: "augusto.morais@memt.com.br", password: "123456" });
   const [isLoading, setIsLoading] = useState(false);
+  const [form, setForm] = useState({ email: "", password: "" });
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -181,7 +183,7 @@ export default function LoginForm() {
                   type="email"
                   id="email"
                   name="email"
-                  value={form.email}
+
                   className="w-full px-4 py-3 bg-white text-gray-800 rounded-md border border-gray-300 focus:border-[#9747FF] focus:outline-none focus:ring-1 focus:ring-[#9747FF]/50 transition-all"
                   onChange={handleChange}
                   required
@@ -196,7 +198,7 @@ export default function LoginForm() {
                   type="password"
                   id="password"
                   name="password"
-                  value={form.password}
+
                   className="w-full px-4 py-3 bg-white text-gray-800 rounded-md border border-gray-300 focus:border-[#9747FF] focus:outline-none focus:ring-1 focus:ring-[#9747FF]/50 transition-all"
                   onChange={handleChange}
                   required

@@ -34,6 +34,16 @@ export default function UsersPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
 
+  const roleToLabel = {
+  Admin: "Administrador",
+  Manager: "Gerente",
+  Mechanic: "Mecânico",
+  Receptionist: "Recepcionista",
+  Supervisor: "Supervisor",
+  Accountant: "Contador",
+};
+
+
   const fetchUsers = async () => {
     try {
       const res = await getUsers();
@@ -155,6 +165,31 @@ export default function UsersPage() {
           minute: "2-digit",
         }),
     },
+  {
+  key: "role",
+  title: "Cargo",
+  sortable: false,
+  render: (_, user) => {
+    const roleMap = {
+      Admin: { label: "Administrador", color: "bg-indigo-600" },
+      Manager: { label: "Gerente", color: "bg-blue-600" },
+      Mechanic: { label: "Mecânico", color: "bg-gray-700" },
+      Receptionist: { label: "Recepcionista", color: "bg-green-600" },
+      Supervisor: { label: "Supervisor", color: "bg-orange-600" },
+      Accountant: { label: "Contador", color: "bg-purple-600" },
+    };
+
+    const role = roleMap[user.role] || { label: user.role, color: "bg-slate-400" };
+
+    return (
+      <span className={`inline-block px-3 py-1 text-white text-xs font-semibold rounded-full ${role.color}`}>
+        {role.label.toUpperCase()}
+      </span>
+    );
+  },
+},
+
+
     {
       key: "isActive",
       title: "Status",
@@ -170,6 +205,7 @@ export default function UsersPage() {
           </span>
         ),
     },
+    
     {
       key: "actions",
       title: "Ações",
@@ -198,7 +234,7 @@ export default function UsersPage() {
     },
   ];
 
-  if (loading) return <p>Carregando usuários…</p>;
+
 
   return (
     <div className="flex h-screen">

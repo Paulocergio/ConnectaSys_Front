@@ -46,6 +46,27 @@ export default function UserFormFields({ formData, onChange, showIsActive = fals
         onChange={onChange}
       />
 
+      <div>
+        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+          Cargo (Função) *
+        </label>
+        <select
+          name="role"
+          value={formData.role}
+          onChange={onChange}
+          required
+          className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="Admin">Administrador</option>
+          <option value="Manager">Gerente</option>
+          <option value="Mechanic">Mecânico</option>
+          <option value="Receptionist">Recepcionista</option>
+          <option value="Supervisor">Supervisor</option>
+          <option value="Accountant">Contador</option>
+        </select>
+      </div>
+
+
       {showIsActive && (
         <div className="flex items-center gap-2 mt-4">
           <input
