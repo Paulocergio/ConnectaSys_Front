@@ -1,11 +1,11 @@
 "use client";
 import { memo, useState, useRef, useCallback } from "react";
-import { User, Mail, Phone, Building, MapPin, Building2 ,MapPinHouse ,MapPinned ,Globe } from "lucide-react";
+import { User, Mail, Phone, Building, MapPin, Building2, MapPinHouse, MapPinned, Globe } from "lucide-react";
 import { debounce } from "lodash";
 import { fetchCnpjData } from "../../services/api/cnpjService";
 import { formatDocument, validateDocumentLength } from "../suppliers/documentFormatter";
+import PhoneInput from '../../utils/PhoneInput';
 
-// Campos que não terão uppercase
 const noUppercase = ["email", "phone", "tax_id", "zip_code"];
 
 const InputField = memo(
@@ -44,12 +44,10 @@ const SuppliersFormFields = memo(({ formData, onChange, onFill }) => {
   const handleChange = useCallback(
     (e) => {
       const { name, value } = e.target;
-
       const formattedValue = formatDocument(value);
-
       const rawValue = formattedValue.replace(/\D/g, "");
+      
       if (rawValue.length > 14) return;
-
       e.target.value = formattedValue;
       onChange(e);
 
@@ -64,14 +62,11 @@ const SuppliersFormFields = memo(({ formData, onChange, onFill }) => {
     debounce(async (value) => {
       const doc = value.replace(/\D/g, "");
       if (doc === lastDocRef.current) return;
-
       lastDocRef.current = doc;
 
       if (doc.length === 14) {
         try {
           const data = await fetchCnpjData(doc);
-          const est = data.estabelecimento;
-
           onFill({
             company_name: data.razao_social || "",
             address: [data.logradouro, data.numero].filter(Boolean).join(", "),
@@ -83,7 +78,6 @@ const SuppliersFormFields = memo(({ formData, onChange, onFill }) => {
             phone: data.telefone1 || "",
             tax_id: formatDocument(doc),
           });
-
           setDocError("");
         } catch (error) {
           setDocError("⚠️ API de CNPJ indisponível. Preencha os dados manualmente.");
@@ -144,12 +138,10 @@ const SuppliersFormFields = memo(({ formData, onChange, onFill }) => {
         type="email"
         errorMessage={formData.emailError}
       />
-      <InputField
-        label="Telefone"
-        name="phone"
-        icon={<Phone />}
+      <PhoneInput
         value={formData.phone}
         onChange={onChange}
+        name="phone"
       />
       <InputField
         label="Endereço"
