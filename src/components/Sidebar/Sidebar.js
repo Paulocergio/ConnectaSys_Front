@@ -9,13 +9,29 @@ import {
   Package,
   Truck,
   UserCheck,
-} from "lucide-react"; 
+  ChevronRight,
+  Menu,
+  X,
+  User,
+  ChevronLeft,
+  PanelLeftClose,
+  PanelLeftOpen,
+} from "lucide-react";
 
-export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
+export default function Sidebar({ isCollapsed = false, toggleSidebar }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(isCollapsed);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+
+  const [userEmail, setUserEmail] = useState("");
+
+  const getInitial = (email) => {
+  if (!email) return "U";
+  return email.charAt(0).toUpperCase();
+};
+
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -34,6 +50,20 @@ export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
       setMobileMenuOpen(false);
     }
   }, [isCollapsed, isMobile]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("user-data");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          setUserEmail(parsed.email || "");
+        } catch (e) {
+          console.error("Erro ao ler user-data:", e);
+        }
+      }
+    }
+  }, []);
 
   const handleToggle = () => {
     if (toggleSidebar) {
@@ -80,51 +110,42 @@ export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
     },
   ];
 
-  // Renderização para mobile
   if (isMobile) {
+
+
     return (
       <div className="relative">
-        {/* Botão hambúrguer elegante */}
+        {/* Botão do menu mobile */}
         <button
           onClick={handleMobileToggle}
-          className="fixed top-4 right-4 z-50 p-3 bg-white/90 backdrop-blur-md shadow-xl rounded-2xl border border-white/20 md:hidden hover:bg-white transition-all duration-300 hover:scale-105"
+          className="fixed top-4 left-4 z-50 p-3 bg-gray-900/90 backdrop-blur-xl text-white rounded-xl border border-gray-700/50 md:hidden hover:bg-gray-800 transition-all duration-300"
           aria-label="Toggle menu"
         >
-          <div
-            className={`w-5 h-5 flex flex-col justify-center items-center transform transition-all duration-300 ${mobileMenuOpen ? "rotate-45" : ""}`}
-          >
-            <span
-              className={`block w-4 h-0.5 bg-gradient-to-r from-slate-600 to-slate-800 rounded-full transform transition-all duration-300 ${mobileMenuOpen ? "rotate-90 translate-y-0" : "-translate-y-1.5"}`}
-            ></span>
-            <span
-              className={`block w-4 h-0.5 bg-gradient-to-r from-slate-600 to-slate-800 rounded-full transform transition-all duration-300 ${mobileMenuOpen ? "opacity-0" : "opacity-100"}`}
-            ></span>
-            <span
-              className={`block w-4 h-0.5 bg-gradient-to-r from-slate-600 to-slate-800 rounded-full transform transition-all duration-300 ${mobileMenuOpen ? "-rotate-90 -translate-y-0" : "translate-y-1.5"}`}
-            ></span>
-          </div>
+          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
 
-        {/* Menu dropdown mobile elegante */}
+        {/* Overlay mobile */}
         <div
-          className={`fixed inset-0 bg-gradient-to-br from-slate-50 via-white to-blue-50/30 backdrop-blur-sm z-40 transform transition-all duration-500 ease-out md:hidden ${
+          className={`fixed inset-0 bg-gray-900/95 backdrop-blur-xl z-40 transform transition-all duration-300 ease-out md:hidden ${
             mobileMenuOpen
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-full pointer-events-none"
+              ? "opacity-100 translate-x-0"
+              : "opacity-0 -translate-x-full pointer-events-none"
           }`}
           onClick={handleOverlayClick}
         >
-          {/* Header do menu mobile */}
-          <div className="flex items-center justify-between px-6 py-8 border-b border-slate-200/50 bg-white/60 backdrop-blur-lg">
-            <div className="flex items-center">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl blur-sm opacity-75"></div>
-                <div className="relative bg-gradient-to-r from-blue-600 to-cyan-500 p-3 rounded-2xl shadow-lg">
+          <div
+            className="w-72 h-full bg-gray-900 border-r border-gray-700/50"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header mobile */}
+            <div className="flex items-center px-6 py-6 border-b border-gray-700/50">
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     fill="white"
-                    className="w-6 h-6"
+                    className="w-5 h-5"
                   >
                     <path
                       fillRule="evenodd"
@@ -134,195 +155,250 @@ export default function Sidebar({ isCollapsed = true, toggleSidebar }) {
                     <path d="M7.5 12a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 12zM7.5 15a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 15zM7.5 18a.75.75 0 01.75-.75h4.5a.75.75 0 010 1.5h-4.5A.75.75 0 017.5 18z" />
                   </svg>
                 </div>
+                <div className="ml-3">
+                  <h1 className="text-white font-semibold text-lg">ConnectaSys</h1>
+                  <p className="text-gray-400 text-sm">Dashboard</p>
+                </div>
               </div>
-              <h1 className="ml-4 text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                ConnectaSys
-              </h1>
             </div>
-            <button
-              onClick={handleMobileToggle}
-              className="p-2 text-slate-500 hover:text-red-500 transition-colors duration-300 hover:bg-red-50 rounded-xl"
-              aria-label="Close menu"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
 
-          {/* Menu items mobile */}
-          <nav
-            className="flex-1 px-6 py-8 overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <ul className="space-y-4 max-w-md mx-auto">
-              {menuItems.map((item, index) => {
-                const isActive = pathname === item.path;
-                return (
-                  <li key={item.path} className={`transform transition-all duration-300 delay-${index * 100}`}>
-                    <Link
-                      href={item.path}
-                      onClick={handleLinkClick}
-                      className={`group flex items-center px-6 py-4 text-base rounded-2xl transition-all duration-300 relative overflow-hidden ${
-                        isActive
-                          ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-xl shadow-blue-500/25 scale-105"
-                          : "text-slate-700 hover:bg-white/80 hover:text-blue-600 hover:shadow-lg hover:scale-105 bg-white/40 backdrop-blur-sm border border-white/20"
-                      }`}
-                    >
-                      {isActive && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-500 opacity-10 rounded-2xl"></div>
-                      )}
-                      <span className={`relative z-10 transition-all duration-300 mr-4 ${
-                        isActive ? "text-white scale-110" : "text-slate-500 group-hover:text-blue-500 group-hover:scale-110"
-                      }`}>
-                        {item.icon}
-                      </span>
-                      <span className="relative z-10 font-semibold">{item.label}</span>
-                      {isActive && (
-                        <div className="absolute right-4 w-2 h-2 bg-white rounded-full opacity-80"></div>
-                      )}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
+            {/* Navegação mobile */}
+            <div className="px-4 py-6">
+              <div className="mb-6">
+                <h2 className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-3 px-2">
+                  Principal
+                </h2>
+                <nav className="space-y-1">
+                  {menuItems.map((item) => {
+                    const isActive = pathname === item.path;
+                    return (
+                      <Link
+                        key={item.path}
+                        href={item.path}
+                        onClick={handleLinkClick}
+                        className={`flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          isActive
+                            ? "bg-gray-800 text-white border border-gray-700/50"
+                            : "text-gray-300 hover:bg-gray-800/50 hover:text-white"
+                        }`}
+                      >
+                        <span className="mr-3">{item.icon}</span>
+                        {item.label}
+                        {isActive && <ChevronRight className="ml-auto h-4 w-4" />}
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </div>
+            </div>
+
+            {/* Footer mobile */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700/50">
+              <div className="flex items-center px-3 py-2">
+                <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                  <User className="h-4 w-4 text-white" />
+                </div>
+                <div className="ml-3">
+                  <p className="text-white text-sm font-medium">{userData.name}</p>
+                  <p className="text-gray-400 text-xs">{userData.email}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
-
+  // Sidebar desktop
   return (
     <div
-      className={`h-full bg-gradient-to-b from-slate-50 to-white border-r border-slate-200/60 shadow transition-all duration-200 ease-out ${
-        collapsed ? "w-14" : "w-44"
+      className={`h-full bg-gray-900 border-r border-gray-700/50 flex flex-col transition-all duration-300 ease-in-out ${
+        collapsed ? "w-16" : "w-72"
       }`}
     >
-     
-      <div className="flex items-center px-2 py-3 border-b border-slate-200/40">
-     
+      {/* Header */}
+      <div className="flex items-center px-6 py-6 border-b border-gray-700/50 relative">
         {!collapsed && (
-          <div className="flex items-center flex-1">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-xl blur-sm opacity-60"></div>
-              <div className="relative bg-gradient-to-r from-blue-500 to-cyan-400 p-2 rounded-xl shadow">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="white"
-                  className="w-5 h-5"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M12 3.75a6.715 6.715 0 00-3.722 1.118.75.75 0 11-.828-1.25 8.25 8.25 0 0112.8 6.883c0 3.014-.574 5.897-1.62 8.543a.75.75 0 01-1.395-.551A21.69 21.69 0 0018.75 10.5 6.75 6.75 0 0012 3.75z"
-                    clipRule="evenodd"
-                  />
-                  <path d="M7.5 12a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 12zM7.5 15a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 15zM7.5 18a.75.75 0 01.75-.75h4.5a.75.75 0 010 1.5h-4.5A.75.75 0 017.5 18z" />
-                </svg>
-              </div>
+          <div className="flex items-center">
+            <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="white"
+                className="w-5 h-5"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M12 3.75a6.715 6.715 0 00-3.722 1.118.75.75 0 11-.828-1.25 8.25 8.25 0 0112.8 6.883c0 3.014-.574 5.897-1.62 8.543a.75.75 0 01-1.395-.551A21.69 21.69 0 0018.75 10.5 6.75 6.75 0 0012 3.75z"
+                  clipRule="evenodd"
+                />
+                <path d="M7.5 12a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 12zM7.5 15a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 15zM7.5 18a.75.75 0 01.75-.75h4.5a.75.75 0 010 1.5h-4.5A.75.75 0 017.5 18z" />
+              </svg>
             </div>
-            <h1 className="ml-2 text-base font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-              ConnectaSys
-            </h1>
+            <div className="ml-3">
+              <h1 className="text-white font-semibold text-lg">ConnectaSys</h1>
+              <p className="text-gray-400 text-sm">
+                {menuItems.find((item) => item.path === pathname)?.label || "Dashboard"}
+              </p>
+            </div>
           </div>
         )}
 
- 
+        {collapsed && (
+          <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center mx-auto">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="white"
+              className="w-5 h-5"
+            >
+              <path
+                fillRule="evenodd"
+                d="M12 3.75a6.715 6.715 0 00-3.722 1.118.75.75 0 11-.828-1.25 8.25 8.25 0 0112.8 6.883c0 3.014-.574 5.897-1.62 8.543a.75.75 0 01-1.395-.551A21.69 21.69 0 0018.75 10.5 6.75 6.75 0 0012 3.75z"
+                clipRule="evenodd"
+              />
+              <path d="M7.5 12a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 12zM7.5 15a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 15zM7.5 18a.75.75 0 01.75-.75h4.5a.75.75 0 010 1.5h-4.5A.75.75 0 017.5 18z" />
+            </svg>
+          </div>
+        )}
+
+        {/* Botão para expandir/colapsar */}
         <button
           onClick={handleToggle}
-          className={`group p-1 text-slate-500 hover:text-blue-600 focus:outline-none transition-all duration-200 rounded-lg hover:bg-blue-50 ${
-            collapsed ? "mx-auto" : "ml-auto"
-          }`}
+          className="absolute -right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-gray-800 border border-gray-700 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-200 hover:scale-110"
+          title={collapsed ? "Expandir sidebar" : "Recolher sidebar"}
         >
           {collapsed ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 transform group-hover:scale-110 transition-transform duration-200"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13 5l7 7-7 7M5 5l7 7-7 7"
-              />
-            </svg>
+            <PanelLeftOpen className="h-3 w-3" />
           ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 transform group-hover:scale-110 transition-transform duration-200"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
-              />
-            </svg>
+            <PanelLeftClose className="h-3 w-3" />
           )}
         </button>
       </div>
 
-
-      <nav className="mt-3 px-1">
-        <ul className="space-y-1">
-          {menuItems.map((item, index) => {
-            const isActive = pathname === item.path;
-            return (
-              <li key={item.path} className={`transform transition-all duration-200 delay-${index * 50}`}>
+      {/* Navegação principal */}
+      <div className="flex-1 px-4 py-6">
+        <div className="mb-8">
+          {!collapsed && (
+            <h2 className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-4 px-2">
+              Principal
+            </h2>
+          )}
+          <nav className="space-y-1">
+            {menuItems.map((item) => {
+              const isActive = pathname === item.path;
+              return (
                 <Link
+                  key={item.path}
                   href={item.path}
-                  className={`group flex items-center ${
-                    collapsed ? "justify-center px-2" : "px-2"
-                  } py-2 text-xs rounded-lg transition-all duration-200 relative overflow-hidden ${
+                  className={`group flex items-center ${collapsed ? "justify-center px-2" : "px-3"} py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive
-                      ? "bg-blue-500 text-white shadow-md scale-105"
-                      : "text-slate-700 hover:bg-slate-100 hover:text-blue-600 hover:shadow-sm hover:scale-105"
+                      ? "bg-gray-800 text-white border border-gray-700/50 shadow-lg"
+                      : "text-gray-300 hover:bg-gray-800/50 hover:text-white"
                   }`}
                   title={collapsed ? item.label : ""}
                 >
-                  {isActive && !collapsed && (
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-white rounded-r-full"></div>
-                  )}
-                  <span className={`transition-all duration-200 ${
-                    isActive ? "text-white scale-110" : "text-slate-500 group-hover:text-blue-500 group-hover:scale-110"
-                  }`}>
-                    {item.icon &&
-                   
-                      <span className="inline-flex items-center justify-center h-4 w-4">
-                        {item.icon}
-                      </span>
-                    }
+                  <span
+                    className={`${collapsed ? "" : "mr-3"} transition-colors duration-200 ${
+                      isActive ? "text-white" : "text-gray-400 group-hover:text-gray-300"
+                    }`}
+                  >
+                    {item.icon}
                   </span>
                   {!collapsed && (
-                    <span className="ml-2 font-medium tracking-wide">{item.label}</span>
-                  )}
-                  {isActive && collapsed && (
-                    <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-white rounded-l-full"></div>
+                    <>
+                      {item.label}
+                      {isActive && <ChevronRight className="ml-auto h-4 w-4 text-gray-400" />}
+                    </>
                   )}
                 </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>    
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Seção adicional (More) */}
+        {!collapsed && (
+          <div>
+            <h2 className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-4 px-2">
+              Mais
+            </h2>
+            <nav className="space-y-1">
+              <button className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white transition-all duration-200">
+                <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                  />
+                </svg>
+                Favoritos
+              </button>
+              <button className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white transition-all duration-200">
+                <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+                Premium
+              </button>
+              <button className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-800/50 hover:text-white transition-all duration-200 group">
+                <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                Configurações
+                <ChevronRight className="ml-auto h-4 w-4 text-gray-400 group-hover:text-gray-300" />
+              </button>
+            </nav>
+          </div>
+        )}
+      </div>
+
+
+      {!collapsed && (
+        <div className="p-4 border-t border-gray-700/50">
+          <div className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-800/50 transition-colors duration-200 cursor-pointer">
+           <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+  {getInitial(userEmail)}
+</div>
+
+<div className="ml-3 flex-1">
+  <p className="text-white text-sm font-medium">{getInitial(userEmail)}</p>
+  <p className="text-gray-400 text-xs">{userEmail}</p>
+</div>
+
+          </div>
+        </div>
+      )}
+
+      {collapsed && (
+        <div className="p-4 border-t border-gray-700/50">
+          <div className="flex justify-center">
+            <div
+              className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center hover:bg-purple-600 transition-colors duration-200 cursor-pointer"
+              title="User Name"
+            >
+              <User className="h-5 w-5 text-white" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

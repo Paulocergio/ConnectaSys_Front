@@ -1,4 +1,5 @@
-// ✅ loginService.js
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+
 export async function login(email, password) {
   try {
     const response = await fetch(`${baseUrl}/auth/login`, {
@@ -15,7 +16,7 @@ export async function login(email, password) {
       return null;
     }
 
-    return data; // ⬅️ Retorna o token e dados do usuário
+    return data;
   } catch (error) {
     console.error("Erro no login:", error);
     return null;
