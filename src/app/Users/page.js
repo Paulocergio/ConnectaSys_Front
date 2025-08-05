@@ -22,6 +22,7 @@ const initialUserData = {
   phone: "",
   password: "",
   isActive: true,
+  role: "Admin",
 };
 
 export default function UsersPage() {
@@ -80,7 +81,7 @@ const handleChange = (e) => {
         ? cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3")
         : cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, "($1) $2-$3");
   } else if (typeof value === "string" && name !== "email" && name !== "password") {
-    newValue = value.toUpperCase(); // converte tudo para UPPERCASE
+    newValue = value.toUpperCase();
   }
 
   setFormData((prev) => ({
@@ -90,7 +91,7 @@ const handleChange = (e) => {
 };
 
   const handleSubmit = async (e) => {
-    e?.preventDefault(); // boa prática
+    e?.preventDefault(); 
 
     try {
       const { password, ...payload } = formData;

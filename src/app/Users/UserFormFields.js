@@ -66,7 +66,6 @@ export default function UserFormFields({ formData, onChange, showIsActive = fals
         </select>
       </div>
 
-
       {showIsActive && (
         <div className="flex items-center gap-2 mt-4">
           <input

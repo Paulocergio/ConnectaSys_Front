@@ -1,15 +1,10 @@
 import api from "./axiosInstance.js";
-
-
-
 function extractErrorMessage(error, fallbackMessage) {
   if (error?.response?.data?.error) return error.response.data.error;
   if (error?.response?.data?.message) return error.response.data.message;
   if (error?.message) return error.message;
   return fallbackMessage;
 }
-
-
 export async function createSupplier(data) {
   const payload = {
     companyName: data.company_name,
