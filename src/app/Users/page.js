@@ -35,16 +35,6 @@ export default function UsersPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
 
-  const roleToLabel = {
-  Admin: "Administrador",
-  Manager: "Gerente",
-  Mechanic: "Mecânico",
-  Receptionist: "Recepcionista",
-  Supervisor: "Supervisor",
-  Accountant: "Contador",
-};
-
-
   const fetchUsers = async () => {
     try {
       const res = await getUsers();
@@ -70,28 +60,33 @@ export default function UsersPage() {
     setIsModalOpen(true);
   };
 
-const handleChange = (e) => {
-  const { name, value, type, checked } = e.target;
-  let newValue = value;
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    let newValue = value;
 
-  if (name === "phone") {
-    const cleaned = value.replace(/\D/g, "").slice(0, 11);
-    newValue =
-      cleaned.length <= 10
-        ? cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3")
-        : cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, "($1) $2-$3");
-  } else if (typeof value === "string" && name !== "email" && name !== "password") {
-    newValue = value.toUpperCase();
-  }
+    if (name === "phone") {
+      const cleaned = value.replace(/\D/g, "").slice(0, 11);
+      newValue =
+        cleaned.length <= 10
+          ? cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3")
+          : cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, "($1) $2-$3");
+    } else if (
+      typeof value === "string" &&
+      name !== "email" &&
+      name !== "password" &&
+      name !== "role"
+    ) {
+      
+    }
 
-  setFormData((prev) => ({
-    ...prev,
-    [name]: type === "checkbox" ? checked : newValue,
-  }));
-};
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : newValue,
+    }));
+  };
 
   const handleSubmit = async (e) => {
-    e?.preventDefault(); 
+    e?.preventDefault();
 
     try {
       const { password, ...payload } = formData;
@@ -174,30 +169,31 @@ const handleChange = (e) => {
           minute: "2-digit",
         }),
     },
-  {
-  key: "role",
-  title: "Cargo",
-  sortable: false,
-  render: (_, user) => {
-    const roleMap = {
-      Admin: { label: "Administrador", color: "bg-indigo-600" },
-      Manager: { label: "Gerente", color: "bg-blue-600" },
-      Mechanic: { label: "Mecânico", color: "bg-gray-700" },
-      Receptionist: { label: "Recepcionista", color: "bg-green-600" },
-      Supervisor: { label: "Supervisor", color: "bg-orange-600" },
-      Accountant: { label: "Contador", color: "bg-purple-600" },
-    };
+    {
+      key: "role",
+      title: "Cargo",
+      sortable: false,
+      render: (_, user) => {
+        const roleMap = {
+          Admin: { label: "Administrador", color: "bg-indigo-600" },
+          Manager: { label: "Gerente", color: "bg-blue-600" },
+          Mechanic: { label: "Mecânico", color: "bg-gray-700" },
+          Receptionist: { label: "Recepcionista", color: "bg-green-600" },
+          Supervisor: { label: "Supervisor", color: "bg-orange-600" },
+          Accountant: { label: "Contador", color: "bg-purple-600" },
+        };
 
-    const role = roleMap[user.role] || { label: user.role, color: "bg-slate-400" };
+        const role = roleMap[user.role] || { label: user.role, color: "bg-slate-400" };
 
-    return (
-      <span className={`inline-block px-3 py-1 text-white text-xs font-semibold rounded-full ${role.color}`}>
-        {role.label.toUpperCase()}
-      </span>
-    );
-  },
-},
-
+        return (
+          <span
+            className={`inline-block px-3 py-1 text-white text-xs font-semibold rounded-full ${role.color}`}
+          >
+            {role.label.toUpperCase()}
+          </span>
+        );
+      },
+    },
 
     {
       key: "isActive",
@@ -214,7 +210,7 @@ const handleChange = (e) => {
           </span>
         ),
     },
-    
+
     {
       key: "actions",
       title: "Ações",
@@ -242,8 +238,6 @@ const handleChange = (e) => {
       ),
     },
   ];
-
-
 
   return (
     <div className="flex h-screen">
