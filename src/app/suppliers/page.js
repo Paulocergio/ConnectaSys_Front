@@ -29,8 +29,10 @@ const initialSupplierData = {
   tax_id: "",
   is_active: true,
 };
-
+import { useAuth } from "../../hooks/useAuth";
 export default function SuppliersPage() {
+   // verifica se o usuário está autenticado
+  useAuth();
   const [suppliers, setSuppliers] = useState([]);
   const [formData, setFormData] = useState(initialSupplierData);
   const [isModalOpen, setIsModalOpen] = useState(false);

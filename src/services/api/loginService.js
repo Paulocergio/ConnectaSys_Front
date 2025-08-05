@@ -1,8 +1,7 @@
-const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-
+// ✅ loginService.js
 export async function login(email, password) {
   try {
-    const response = await fetch(`${baseUrl}/auth/login`, { // <--- sem repetir /api/v1
+    const response = await fetch(`${baseUrl}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -13,23 +12,12 @@ export async function login(email, password) {
     const data = await response.json();
 
     if (!response.ok) {
-      const errorMessage = data?.message || "Erro desconhecido ao fazer login.";
-      return false;
+      return null;
     }
 
-    if (typeof window !== "undefined") {
-      localStorage.setItem(
-        "user-data",
-        JSON.stringify({
-          email: data.email,
-          token: data.token,
-        })
-      );
-    }
-
-    return true;
+    return data; // ⬅️ Retorna o token e dados do usuário
   } catch (error) {
-    console.error("Erro na requisição de login:", error);
-    return false;
+    console.error("Erro no login:", error);
+    return null;
   }
 }

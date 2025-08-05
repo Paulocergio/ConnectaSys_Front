@@ -1,6 +1,5 @@
 "use client";
 
-
 import { login } from "../../services/api/loginService";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -26,8 +25,19 @@ export default function LoginForm() {
     setIsLoading(true);
 
     try {
-      const success = await login(form.email, form.password);
-      if (success) {
+      const data = await login(form.email, form.password);
+
+      if (data?.token) {
+        document.cookie = `token=${data.token}; path=/; max-age=86400`;
+
+        localStorage.setItem(
+          "user-data",
+          JSON.stringify({
+            email: data.email,
+            token: data.token,
+          })
+        );
+
         showSuccess("Login realizado com sucesso!");
         router.push("/customer");
       } else {
@@ -184,7 +194,6 @@ export default function LoginForm() {
                   type="email"
                   id="email"
                   name="email"
-
                   className="w-full px-4 py-3 bg-white text-gray-800 rounded-md border border-gray-300 focus:border-[#9747FF] focus:outline-none focus:ring-1 focus:ring-[#9747FF]/50 transition-all"
                   onChange={handleChange}
                   required
@@ -199,7 +208,6 @@ export default function LoginForm() {
                   type="password"
                   id="password"
                   name="password"
-
                   className="w-full px-4 py-3 bg-white text-gray-800 rounded-md border border-gray-300 focus:border-[#9747FF] focus:outline-none focus:ring-1 focus:ring-[#9747FF]/50 transition-all"
                   onChange={handleChange}
                   required

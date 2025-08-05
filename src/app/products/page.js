@@ -6,7 +6,7 @@ import Table from "../../components/Table/Table";
 import ModalAddGeneric from "../../components/Modals/ModalAddGeneric";
 import ModalEditGeneric from "../../components/Modals/ModalEditGeneric";
 import ConfirmDeleteModal from "../../components/Modals/ModalConfirmDelete";
-
+import { useAuth } from "../../hooks/useAuth";
 import {
   showSuccess,
   showError,
@@ -28,6 +28,8 @@ const initialProductData = {
 
 
 export default function Products() {
+  // verifica se o usuário está autenticado
+  useAuth();
   const [products, setProducts] = useState([]);
   const [formData, setFormData] = useState(initialProductData);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
@@ -43,7 +45,7 @@ export default function Products() {
       const res = await getAllProducts();
       const normalized = res.data.map((p) => ({
         ...p,
-        id: p.product_id, // para uso em edição/exclusão
+        id: p.product_id, 
       }));
       setProducts(normalized);
     } catch (error) {
@@ -71,10 +73,10 @@ export default function Products() {
 
     let parsedValue = value;
 
-    // Verifica se o campo é numérico
+
     const numericFields = ["quantity", "cost_price", "sale_price"];
     if (numericFields.includes(name)) {
-      // Converte vírgula para ponto, depois para float
+
       parsedValue = parseFloat(value.replace(",", "."));
       if (isNaN(parsedValue)) parsedValue = "";
     }
@@ -94,7 +96,7 @@ export default function Products() {
 
       console.log("🔧 Atualizando produto com payload:", formData);
 
-      // 🔹 Atualiza o produto
+
      await updateProduct(formData.id, {
   product_name: formData.product_name,
   barcode: formData.barcode,
@@ -103,13 +105,12 @@ export default function Products() {
   sale_price: parseFloat(formData.sale_price),
 });
 
-      // 🔹 Atualiza o estoque
+
       const stockPayload = {
         productId: formData.id,
         quantity: parseInt(formData.quantity ?? 0),
       };
 
-      console.log("📦 Atualizando estoque com:", stockPayload);
       await createStockEntry(stockPayload);
 
       await fetchProducts();
@@ -123,8 +124,7 @@ export default function Products() {
 
   const handleSave = async () => {
     try {
-      console.log("🚀 Início do handleSave");
-      console.log("📦 Dados do formData:", formData);
+    
 
       if (!formData.product_name || !formData.barcode) {
         showError("Preencha os campos obrigatórios: Nome e Código de Barras.");
@@ -144,14 +144,12 @@ export default function Products() {
       const res = await createProduct(productPayload);
       const createdProduct = res.data;
 
-      console.log("✅ Produto criado:", createdProduct);
 
       const stockPayload = {
         productId: createdProduct.product_id,
         quantity: Number(formData.quantity) || 0,
       };
 
-      console.log("📤 Enviando para /Stock/entries:", stockPayload);
       await createStockEntry(stockPayload);
 
       await fetchProducts();
@@ -159,8 +157,6 @@ export default function Products() {
       setFormData(initialProductData);
       showSuccess("Produto e estoque cadastrados com sucesso.");
     } catch (error) {
-      console.error("❌ Erro ao salvar produto:", error);
-      console.log("📄 Resposta do erro:", error?.response?.data);
       showError(error?.response?.data?.error || "Erro ao cadastrar produto.");
     }
 

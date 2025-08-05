@@ -14,7 +14,7 @@ import { getUsers, deleteUser, updateUser, createUser } from "../../services/api
 import UserFormFields from "./UserFormFields";
 import { Edit, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
-
+import { useAuth } from "../../hooks/useAuth";
 const initialUserData = {
   firstName: "",
   lastName: "",
@@ -26,6 +26,8 @@ const initialUserData = {
 };
 
 export default function UsersPage() {
+   // verifica se o usuário está autenticado
+  useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [collapsed, setCollapsed] = useState(true);

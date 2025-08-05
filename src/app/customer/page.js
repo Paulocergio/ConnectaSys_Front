@@ -19,8 +19,8 @@ import {
 import CustomerFormFields from "./CustomerFormFields";
 import { Edit, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useAuth } from "../../hooks/useAuth";
 
-// Dados iniciais para novo cliente
 const initialCustomerData = {
   firstName: "",
   lastName: "",
@@ -32,6 +32,8 @@ const initialCustomerData = {
 };
 
 export default function CustomerPage() {
+  // verifica se o usuário está autenticado
+  useAuth();
   const [customers, setCustomers] = useState([]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,16 +57,14 @@ export default function CustomerPage() {
     fetchCustomers();
   }, []);
 
-  // Função para abrir modal de adicionar
   const handleAddClick = () => {
     setFormData(initialCustomerData);
     setIsAddModalOpen(true);
   };
 
-  // Função para abrir modal de editar
   const handleEditClick = (customer) => {
     const { createdAt, updatedAt, deletedAt, password, ...cleaned } = customer;
-    setFormData({ ...cleaned, id: customer.id }); // <-- este ID precisa estar presente!
+    setFormData({ ...cleaned, id: customer.id });
     setIsModalOpen(true);
   };
 
@@ -175,93 +175,93 @@ export default function CustomerPage() {
     setItemToDelete(null);
   };
 
-const columns = [
-  {
-    key: "name",
-    title: "Nome Completo",
-    sortable: true,
-    render: (_, c) => `${c.firstName} ${c.lastName}`.toUpperCase(),
-  },
-  {
-    key: "email",
-    title: "Email",
-    sortable: true,
-    render: (_, c) => String(c.email).toUpperCase(),
-  },
-  {
-    key: "phone",
-    title: "Telefone",
-    sortable: false,
-    render: (_, c) => (c.phone ? String(c.phone).toUpperCase() : "NÃO INFORMADO"),
-  },
-  {
-    key: "documentNumber",
-    title: "Documento",
-    sortable: false,
-    render: (_, c) => (c.documentNumber ? String(c.documentNumber).toUpperCase() : "NÃO INFORMADO"),
-  },
-  {
-    key: "address",
-    title: "Endereço",
-    sortable: false,
-    render: (_, c) => (c.address ? String(c.address).toUpperCase() : "NÃO INFORMADO"),
-  },
-  {
-    key: "createdAt",
-    title: "Criado em",
-    sortable: true,
-    render: (_, c) =>
-      new Date(c.createdAt).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-  },
-  {
-    key: "isActive",
-    title: "Status",
-    sortable: false,
-    render: (_, c) =>
-      c.isActive ? (
-        <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
-          ATIVO
-        </span>
-      ) : (
-        <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-medium">
-          INATIVO
-        </span>
+  const columns = [
+    {
+      key: "name",
+      title: "Nome Completo",
+      sortable: true,
+      render: (_, c) => `${c.firstName} ${c.lastName}`.toUpperCase(),
+    },
+    {
+      key: "email",
+      title: "Email",
+      sortable: true,
+      render: (_, c) => String(c.email).toUpperCase(),
+    },
+    {
+      key: "phone",
+      title: "Telefone",
+      sortable: false,
+      render: (_, c) => (c.phone ? String(c.phone).toUpperCase() : "NÃO INFORMADO"),
+    },
+    {
+      key: "documentNumber",
+      title: "Documento",
+      sortable: false,
+      render: (_, c) =>
+        c.documentNumber ? String(c.documentNumber).toUpperCase() : "NÃO INFORMADO",
+    },
+    {
+      key: "address",
+      title: "Endereço",
+      sortable: false,
+      render: (_, c) => (c.address ? String(c.address).toUpperCase() : "NÃO INFORMADO"),
+    },
+    {
+      key: "createdAt",
+      title: "Criado em",
+      sortable: true,
+      render: (_, c) =>
+        new Date(c.createdAt).toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+    },
+    {
+      key: "isActive",
+      title: "Status",
+      sortable: false,
+      render: (_, c) =>
+        c.isActive ? (
+          <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+            ATIVO
+          </span>
+        ) : (
+          <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-medium">
+            INATIVO
+          </span>
+        ),
+    },
+    {
+      key: "actions",
+      title: "Ações",
+      sortable: false,
+      render: (_, c) => (
+        <div className="flex gap-3">
+          <button
+            onClick={() => handleEditClick(c)}
+            className="text-blue-600 hover:text-blue-800 transition-colors"
+            title="Editar cliente"
+          >
+            <Edit size={16} />
+          </button>
+          <button
+            onClick={() => {
+              setItemToDelete(c);
+              setIsDeleteModalOpen(true);
+            }}
+            className="text-red-600 hover:text-red-800 transition-colors"
+            title="Excluir cliente"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
       ),
-  },
-  {
-    key: "actions",
-    title: "Ações",
-    sortable: false,
-    render: (_, c) => (
-      <div className="flex gap-3">
-        <button
-          onClick={() => handleEditClick(c)}
-          className="text-blue-600 hover:text-blue-800 transition-colors"
-          title="Editar cliente"
-        >
-          <Edit size={16} />
-        </button>
-        <button
-          onClick={() => {
-            setItemToDelete(c);
-            setIsDeleteModalOpen(true);
-          }}
-          className="text-red-600 hover:text-red-800 transition-colors"
-          title="Excluir cliente"
-        >
-          <Trash2 size={16} />
-        </button>
-      </div>
-    ),
-  },
-];
-
+    },
+  ];
 
   return (
     <div className="flex h-screen">

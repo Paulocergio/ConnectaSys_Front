@@ -3,7 +3,6 @@
 import { memo } from "react";
 import { Package, ScanBarcode, FileText, Hash } from "lucide-react";
 
-// Campos que NÃO devem ser forçados para uppercase
 const noUppercase = ["quantity", "cost_price", "sale_price"];
 
 const InputField = memo(
@@ -95,5 +94,5 @@ const ProductFormFields = memo(({ formData, onChange }) => {
     </>
   );
 });
-//testeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+
 export default ProductFormFields;
