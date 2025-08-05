@@ -249,7 +249,7 @@ export default function SuppliersPage() {
     [formData, handleChange, handleFill]
   );
 
-  if (loading) return <p>Carregando fornecedores…</p>;
+
 
   return (
     <div className="flex h-screen">

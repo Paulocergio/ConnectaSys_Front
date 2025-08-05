@@ -35,7 +35,8 @@ export default function LoginForm() {
           JSON.stringify({
             email: data.email,
             token: data.token,
-            
+            firstName: data.firstName,
+            lastName: data.lastName,
           })
         );
 
