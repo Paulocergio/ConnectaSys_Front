@@ -1,14 +1,20 @@
 "use client";
 
 
+import { login } from "../../services/api/loginService";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { login } from "../../services/api/login"; // Ajuste o caminho conforme necessário 
-
+import {
+  showSuccess,
+  showError,
+  ToastContainerWrapper,
+} from "../../components/Toast/ToastNotification";
 
 export default function LoginForm() {
   const router = useRouter();
+  const [form, setForm] = useState({ email: "", password: "" });
+
   const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
 
@@ -19,13 +25,17 @@ export default function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+
     try {
       const success = await login(form.email, form.password);
       if (success) {
+        showSuccess("Login realizado com sucesso!");
         router.push("/customer");
       } else {
-        alert("Usuário ou senha inválidos.");
+        showError("Usuário ou senha inválidos.");
       }
+    } catch (error) {
+      showError("Erro ao tentar logar. Tente novamente.");
     } finally {
       setIsLoading(false);
     }
@@ -33,11 +43,8 @@ export default function LoginForm() {
 
   return (
     <div className="flex flex-col md:flex-row h-screen w-full">
-      {/* Lado esquerdo - Fundo com gradiente suave de #F4F5FA para #ECEDF3 */}
       <div className="hidden md:flex md:w-2/3 bg-gradient-to-b from-[#F4F5FA] to-[#ECEDF3] justify-center items-center relative overflow-hidden">
-        {/* Conteúdo central com boneco e estatísticas */}
         <div className="flex flex-col items-center justify-center w-full max-w-xl p-4">
-          {/* Cartão de projeto */}
           <div className="absolute top-[20%] left-[30%] bg-white rounded-lg shadow-sm p-4 w-40">
             <div className="flex items-center mb-2">
               <div className="w-6 h-6 rounded-full bg-[#9747FF] flex items-center justify-center mr-2">
@@ -77,7 +84,6 @@ export default function LoginForm() {
             </div>
           </div>
 
-          {/* Boneco (reduzido em tamanho) */}
           <div className="w-64 h-64 my-10">
             <Image
               src="/v2-login-light.png"
@@ -89,7 +95,6 @@ export default function LoginForm() {
             />
           </div>
 
-          {/* Cartão de lucro total (lado direito) */}
           <div className="absolute bottom-[30%] right-[25%] bg-white rounded-lg shadow-sm p-4 w-44">
             <div className="text-lg font-semibold text-gray-800 mb-1">$86.4k</div>
             <div className="h-16 mb-1">
@@ -107,7 +112,6 @@ export default function LoginForm() {
             <div className="text-xs text-gray-600">Total Profit</div>
           </div>
 
-          {/* Cartão de lucro (lado esquerdo) */}
           <div className="absolute top-[60%] left-[15%] bg-white rounded-lg shadow-sm p-3 w-48">
             <div className="flex items-center mb-2">
               <div className="w-5 h-5 bg-yellow-100 rounded-sm flex items-center justify-center mr-2">
@@ -131,10 +135,8 @@ export default function LoginForm() {
         </div>
       </div>
 
-      {/* Lado direito - Formulário com fundo #FFFFFF */}
       <div className="w-full md:w-1/3 flex items-center justify-center bg-white min-h-screen">
         <div className="w-full max-w-md px-4 sm:px-6 md:px-8 py-8 md:py-12">
-          {/* Mostrar a imagem em dispositivos móveis */}
           <div className="md:hidden flex justify-center mb-8 bg-gradient-to-b from-[#F4F5FA] to-[#ECEDF3] py-8 rounded-lg">
             <div className="w-40">
               <Image
@@ -316,6 +318,7 @@ export default function LoginForm() {
               </p>
             </div>
           </form>
+          <ToastContainerWrapper />
         </div>
       </div>
     </div>

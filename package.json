@@ -11,6 +11,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.4",
     "axios": "^1.9.0",
+    "debounce": "^2.2.0",
     "framer-motion": "^12.9.2",
     "lodash": "^4.17.21",
     "lucide-react": "^0.503.0",
@@ -26,6 +27,8 @@
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/node": "22.15.3",
     "@types/react": "19.1.2",
+    "eslint-config-prettier": "^10.1.5",
+    "prettier": "^3.5.3",
     "tailwindcss": "^4",
     "typescript": "5.8.3"
   }

@@ -69,18 +69,26 @@ export default function UsersPage() {
     setIsModalOpen(true);
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    let newValue = value;
-    if (name === "phone") {
-      const cleaned = value.replace(/\D/g, "").slice(0, 11);
-      newValue =
-        cleaned.length <= 10
-          ? cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3")
-          : cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, "($1) $2-$3");
-    }
-    setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : newValue }));
-  };
+const handleChange = (e) => {
+  const { name, value, type, checked } = e.target;
+  let newValue = value;
+
+  if (name === "phone") {
+    const cleaned = value.replace(/\D/g, "").slice(0, 11);
+    newValue =
+      cleaned.length <= 10
+        ? cleaned.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3")
+        : cleaned.replace(/^(\d{2})(\d{5})(\d{0,4})$/, "($1) $2-$3");
+  } else if (typeof value === "string" && name !== "email" && name !== "password") {
+    newValue = value.toUpperCase(); // converte tudo para UPPERCASE
+  }
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]: type === "checkbox" ? checked : newValue,
+  }));
+};
+
   const handleSubmit = async (e) => {
     e?.preventDefault(); // boa prática
 
