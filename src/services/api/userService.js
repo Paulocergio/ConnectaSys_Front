@@ -2,8 +2,14 @@
 import api from "./axiosInstance.js";
 
 
+const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+});
+
+
+
 export async function getUsers() {
-  const response = await api.get("/Users");
+  const response = await api.get("/User");
   return {
     data: response.data.map((user) => ({
       id: user.id,
@@ -12,15 +18,19 @@ export async function getUsers() {
       email: user.email,
       phone: user.phone ?? "",
       isActive: user.isActive,
-      password: user.password,
       createdAt: user.createdAt,
+      role: user.role,
     })),
   };
 }
 
+
+// DELETE: remove usuário por ID
 export async function deleteUser(id) {
-  return api.delete(`/Users/${id}`);
+  return api.delete(`/User/${id}`);
 }
+
+// PUT: atualiza usuário
 export async function updateUser(id, data) {
   const payload = {
     firstName: data.firstName,
@@ -29,10 +39,13 @@ export async function updateUser(id, data) {
     phone: data.phone ?? "",
     password: data.password,
     isActive: data.isActive,
+     role: data.role, 
   };
 
-  return api.put(`/Users/${id}`, payload);
+  return api.put(`/User/${id}`, payload);
 }
+
+// POST: cria novo usuário
 export async function createUser(data) {
   const payload = {
     firstName: data.firstName,
@@ -41,6 +54,7 @@ export async function createUser(data) {
     phone: data.phone ?? "",
     password: data.password,
     isActive: data.isActive,
+    role: data.role,
   };
-  return api.post(`/Users`, payload);
+  return api.post(`/User`, payload);
 }

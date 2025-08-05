@@ -22,3 +22,4 @@ export async function fetchCnpjData(cnpj) {
     throw new Error("Erro ao consultar o CNPJ");
   }
 }
+

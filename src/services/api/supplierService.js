@@ -1,7 +1,7 @@
 import api from "./axiosInstance.js";
 
 
-// 🔧 Função utilitária para extrair mensagens de erro
+
 function extractErrorMessage(error, fallbackMessage) {
   if (error?.response?.data?.error) return error.response.data.error;
   if (error?.response?.data?.message) return error.response.data.message;
@@ -9,7 +9,7 @@ function extractErrorMessage(error, fallbackMessage) {
   return fallbackMessage;
 }
 
-// ✅ Criar fornecedor
+
 export async function createSupplier(data) {
   const payload = {
     companyName: data.company_name,
@@ -33,7 +33,7 @@ export async function createSupplier(data) {
   }
 }
 
-// ✅ Buscar fornecedores
+
 export async function getSuppliers() {
   try {
     return await api.get("/Suppliers");
@@ -42,7 +42,7 @@ export async function getSuppliers() {
   }
 }
 
-// ✅ Atualizar fornecedor
+
 export async function updateSupplier(id, data) {
   const payload = {
     companyName: data.company_name,
@@ -69,7 +69,7 @@ export async function updateSupplier(id, data) {
   }
 }
 
-// ✅ Excluir fornecedor
+
 export async function deleteSupplier(id) {
   try {
     const response = await api.delete(`/Suppliers/${id}`);
