@@ -2,7 +2,7 @@ const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export async function login(email, password) {
   try {
-    const response = await fetch(`${baseUrl}/api/v1/auth/login`, {
+    const response = await fetch(`${baseUrl}/auth/login`, { // <--- sem repetir /api/v1
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -14,7 +14,6 @@ export async function login(email, password) {
 
     if (!response.ok) {
       const errorMessage = data?.message || "Erro desconhecido ao fazer login.";
-
       return false;
     }
 

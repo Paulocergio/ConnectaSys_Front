@@ -1,14 +1,10 @@
-// services/login.js
-import axios from "axios";
-
 export async function login(email, password) {
   try {
     const response = await axios.post(
-      "https://localhost:32771/api/Auth/login", // coloque aqui a URL real da sua API
+      "http://localhost:3000/api/v1/auth/login",
       { email, password }
     );
 
-    // Salva o token no localStorage, se quiser reutilizar depois
     if (response.data?.accessToken) {
       localStorage.setItem("token", response.data.accessToken);
     }
