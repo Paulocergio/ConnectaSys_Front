@@ -13,7 +13,6 @@ import {
 
 export default function LoginForm() {
   const router = useRouter();
-  const [form, setForm] = useState({ email: "", password: "" });
 
   const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
