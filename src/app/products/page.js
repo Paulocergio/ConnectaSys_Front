@@ -11,10 +11,14 @@ import {
   showSuccess,
   showError,
   ToastContainerWrapper,
-}
-  from "../../components/Toast/ToastNotification";
+} from "../../components/Toast/ToastNotification";
 import { getAllProducts } from "../../services/api/products";
-import { createProduct, updateProduct, deleteProduct, createStockEntry } from "../../services/api/products";
+import {
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  createStockEntry,
+} from "../../services/api/products";
 import ProductFormFields from "../products/productsFormFields";
 import { Edit, Trash2 } from "lucide-react";
 const initialProductData = {
@@ -25,6 +29,7 @@ const initialProductData = {
   cost_price: 0,
   sale_price: 0,
 };
+
 
 
 export default function Products() {
@@ -45,7 +50,7 @@ export default function Products() {
       const res = await getAllProducts();
       const normalized = res.data.map((p) => ({
         ...p,
-        id: p.product_id, 
+        id: p.product_id,
       }));
       setProducts(normalized);
     } catch (error) {
@@ -68,99 +73,76 @@ export default function Products() {
     setIsModalOpen(true);
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+const handleChange = (e) => {
+  const { name, value, type, checked } = e.target;
+  const parsedValue = name === "quantity" ? parseInt(value) || 0 : value;
 
-    let parsedValue = value;
+  setFormData((prev) => ({
+    ...prev,
+    [name]: type === "checkbox" ? checked : parsedValue,
+  }));
+};
 
 
-    const numericFields = ["quantity", "cost_price", "sale_price"];
-    if (numericFields.includes(name)) {
-
-      parsedValue = parseFloat(value.replace(",", "."));
-      if (isNaN(parsedValue)) parsedValue = "";
+const handleSubmit = async () => {
+  try {
+    if (!formData.id) {
+      showError("Produto sem ID para edição.");
+      return;
     }
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : parsedValue,
-    }));
-  };
-
-  const handleSubmit = async () => {
-    try {
-      if (!formData.id) {
-        showError("Produto sem ID para edição.");
-        return;
-      }
-
-      console.log("🔧 Atualizando produto com payload:", formData);
-
-
-     await updateProduct(formData.id, {
+await updateProduct(formData.id, {
   product_name: formData.product_name,
   barcode: formData.barcode,
   description: formData.description,
-  cost_price: parseFloat(formData.cost_price),
-  sale_price: parseFloat(formData.sale_price),
+  quantity: parseInt(formData.quantity ?? 0),
+  cost_price: parseFloat(formData.cost_price ?? 0),
+  sale_price: parseFloat(formData.sale_price ?? 0),
+  profit_margin:
+    formData.cost_price && formData.sale_price
+      ? ((formData.sale_price - formData.cost_price) / formData.cost_price) * 100
+      : 0,
 });
 
-
-      const stockPayload = {
-        productId: formData.id,
-        quantity: parseInt(formData.quantity ?? 0),
-      };
-
-      await createStockEntry(stockPayload);
-
-      await fetchProducts();
-      showSuccess("Produto e estoque atualizados com sucesso.");
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error("❌ Erro ao atualizar produto e estoque:", error);
-      showError(error?.response?.data?.error || "Erro ao atualizar produto e estoque.");
-    }
-  };
-
-  const handleSave = async () => {
-    try {
-    
-
-      if (!formData.product_name || !formData.barcode) {
-        showError("Preencha os campos obrigatórios: Nome e Código de Barras.");
-        return;
-      }
-
-      const productPayload = {
-        product_name: formData.product_name,
-        barcode: formData.barcode,
-        description: formData.description,
-        cost_price: formData.cost_price,
-        sale_price: formData.sale_price,
-      };
+    await fetchProducts();
+    showSuccess("Produto atualizado com sucesso.");
+    setIsModalOpen(false);
+  } catch (error) {
+    showError(error?.response?.data?.error || "Erro ao atualizar produto.");
+  }
+};
 
 
-      console.log("📤 Enviando para /Products/products:", productPayload);
-      const res = await createProduct(productPayload);
-      const createdProduct = res.data;
-
-
-      const stockPayload = {
-        productId: createdProduct.product_id,
-        quantity: Number(formData.quantity) || 0,
-      };
-
-      await createStockEntry(stockPayload);
-
-      await fetchProducts();
-      setIsAddModalOpen(false);
-      setFormData(initialProductData);
-      showSuccess("Produto e estoque cadastrados com sucesso.");
-    } catch (error) {
-      showError(error?.response?.data?.error || "Erro ao cadastrar produto.");
+const handleSave = async () => {
+  try {
+    if (!formData.product_name || !formData.barcode) {
+      showError("Preencha os campos obrigatórios: Nome e Código de Barras.");
+      return;
     }
 
-  };
+const productPayload = {
+  product_name: formData.product_name,
+  barcode: formData.barcode,
+  description: formData.description,
+  quantity: parseInt(formData.quantity ?? 0),
+  cost_price: parseFloat(formData.cost_price ?? 0),
+  sale_price: parseFloat(formData.sale_price ?? 0),
+  profit_margin:
+    formData.cost_price && formData.sale_price
+      ? ((formData.sale_price - formData.cost_price) / formData.cost_price) * 100
+      : 0,
+};
+
+
+    await createProduct(productPayload);
+    await fetchProducts();
+    setIsAddModalOpen(false);
+    setFormData(initialProductData);
+    showSuccess("Produto criado com sucesso.");
+  } catch (error) {
+    showError(error?.response?.data?.error || "Erro ao cadastrar produto.");
+  }
+};
+
 
   const confirmDelete = async () => {
     try {
@@ -174,96 +156,94 @@ export default function Products() {
       setItemToDelete(null);
     }
   };
-const columns = [
-  {
-    key: "product_name",
-    title: "Produto",
-    sortable: true,
-    render: (_, p) => String(p.product_name).toUpperCase(),
-  },
-  {
-    key: "barcode",
-    title: "Código de Barras",
-    sortable: true,
-    render: (_, p) => (p.barcode ? String(p.barcode).toUpperCase() : "NÃO INFORMADO"),
-  },
-  {
-    key: "description",
-    title: "Descrição",
-    sortable: false,
-    render: (_, p) => (p.description ? String(p.description).toUpperCase() : "—"),
-  },
-  {
-    key: "quantity",
-    title: "Estoque",
-    sortable: true,
-    render: (_, p) => `${p.quantity ?? 0} un.`,
-  },
-  {
-    key: "cost_price",
-    title: "Preço de Custo (R$)",
-    sortable: true,
-    render: (_, p) =>
-      p.cost_price !== undefined && p.cost_price !== null
-        ? `R$ ${Number(p.cost_price).toFixed(2)}`
-        : "—",
-  },
-  {
-    key: "sale_price",
-    title: "Preço de Venda (R$)",
-    sortable: true,
-    render: (_, p) =>
-      p.sale_price !== undefined && p.sale_price !== null
-        ? `R$ ${Number(p.sale_price).toFixed(2)}`
-        : "—",
-  },
-  {
-    key: "profit_margin",
-    title: "Margem Lucro (%)",
-    sortable: true,
-    render: (_, p) =>
-      p.profit_margin !== undefined && p.profit_margin !== null ? (
-        <span
-          className={`font-medium ${
-            Number(p.profit_margin) >= 0 ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          {Number(p.profit_margin).toFixed(2)}%
-        </span>
-      ) : (
-        "—"
+  const columns = [
+   {
+  key: "productName", 
+  title: "Produto",
+  sortable: true,
+  render: (_, p) => String(p.productName).toUpperCase(), 
+},
+
+    {
+      key: "barcode",
+      title: "Código de Barras",
+      sortable: true,
+      render: (_, p) => (p.barcode ? String(p.barcode).toUpperCase() : "NÃO INFORMADO"),
+    },
+    {
+      key: "description",
+      title: "Descrição",
+      sortable: false,
+      render: (_, p) => (p.description ? String(p.description).toUpperCase() : "—"),
+    },
+    {
+      key: "quantity",
+      title: "Estoque",
+      sortable: true,
+      render: (_, p) => `${p.quantity ?? 0} un.`,
+    },
+    {
+      key: "cost_price",
+      title: "Preço de Custo (R$)",
+      sortable: true,
+      render: (_, p) =>
+        p.cost_price !== undefined && p.cost_price !== null
+          ? `R$ ${Number(p.cost_price).toFixed(2)}`
+          : "—",
+    },
+    {
+      key: "sale_price",
+      title: "Preço de Venda (R$)",
+      sortable: true,
+      render: (_, p) =>
+        p.sale_price !== undefined && p.sale_price !== null
+          ? `R$ ${Number(p.sale_price).toFixed(2)}`
+          : "—",
+    },
+    {
+      key: "profit_margin",
+      title: "Margem Lucro (%)",
+      sortable: true,
+      render: (_, p) =>
+        p.profit_margin !== undefined && p.profit_margin !== null ? (
+          <span
+            className={`font-medium ${
+              Number(p.profit_margin) >= 0 ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {Number(p.profit_margin).toFixed(2)}%
+          </span>
+        ) : (
+          "—"
+        ),
+    },
+    {
+      key: "actions",
+      title: "Ações",
+      sortable: false,
+      render: (_, p) => (
+        <div className="flex gap-3">
+          <button
+            onClick={() => handleEditClick(p)}
+            className="text-blue-600 hover:text-blue-800 transition-colors"
+            title="Editar produto"
+          >
+            <Edit size={16} />
+          </button>
+          <button
+            onClick={() => {
+              setItemToDelete(p);
+              setIsDeleteModalOpen(true);
+            }}
+            className="text-red-600 hover:text-red-800 transition-colors"
+            title="Excluir produto"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
       ),
-  },
-  {
-    key: "actions",
-    title: "Ações",
-    sortable: false,
-    render: (_, p) => (
-      <div className="flex gap-3">
-        <button
-          onClick={() => handleEditClick(p)}
-          className="text-blue-600 hover:text-blue-800 transition-colors"
-          title="Editar produto"
-        >
-          <Edit size={16} />
-        </button>
-        <button
-          onClick={() => {
-            setItemToDelete(p);
-            setIsDeleteModalOpen(true);
-          }}
-          className="text-red-600 hover:text-red-800 transition-colors"
-          title="Excluir produto"
-        >
-          <Trash2 size={16} />
-        </button>
-      </div>
-    ),
-  },
-];
-
-
-
+    },
+  ];
 
   return (
     <div className="flex h-screen">
@@ -289,7 +269,6 @@ const columns = [
         </ModalAddGeneric>
       )}
 
-
       <ModalEditGeneric
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -301,19 +280,12 @@ const columns = [
         <ProductFormFields formData={formData} onChange={handleChange} />
       </ModalEditGeneric>
 
-
-
-
-
       <ConfirmDeleteModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={confirmDelete}
         itemName={itemToDelete?.product_name || ""}
       />
-
-
-
     </div>
   );
 }
