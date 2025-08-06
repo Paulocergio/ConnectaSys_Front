@@ -206,6 +206,15 @@ const columns = [
       }) || "R$ 0,00",
   },
   { key: "status", title: "Status", sortable: true },
+   {
+    key: "openedDate",
+    title: "Data de Abertura",
+    sortable: true,
+    render: (_, r) => {
+      if (!r.openedDate) return "Não informada";
+      return new Date(r.openedDate).toLocaleDateString("pt-BR");
+    },
+  },
   {
     key: "scheduledDate",
     title: "Data Agendada",
@@ -215,15 +224,7 @@ const columns = [
       return new Date(r.scheduledDate).toLocaleDateString("pt-BR");
     },
   },
-  {
-    key: "openedDate",
-    title: "Data de Abertura",
-    sortable: true,
-    render: (_, r) => {
-      if (!r.openedDate) return "Não informada";
-      return new Date(r.openedDate).toLocaleDateString("pt-BR");
-    },
-  },
+ 
   {
     key: "actions",
     title: "Ações",
