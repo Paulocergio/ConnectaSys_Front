@@ -30,8 +30,6 @@ const initialProductData = {
   sale_price: 0,
 };
 
-
-
 export default function Products() {
   // verifica se o usuário está autenticado
   useAuth();
@@ -73,76 +71,72 @@ export default function Products() {
     setIsModalOpen(true);
   };
 
-const handleChange = (e) => {
-  const { name, value, type, checked } = e.target;
-  const parsedValue = name === "quantity" ? parseInt(value) || 0 : value;
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    const parsedValue = name === "quantity" ? parseInt(value) || 0 : value;
 
-  setFormData((prev) => ({
-    ...prev,
-    [name]: type === "checkbox" ? checked : parsedValue,
-  }));
-};
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : parsedValue,
+    }));
+  };
 
+  const handleSubmit = async () => {
+    try {
+      if (!formData.id) {
+        showError("Produto sem ID para edição.");
+        return;
+      }
+      await updateProduct(formData.id, {
+        product_name: formData.product_name,
+        barcode: formData.barcode,
+        description: formData.description,
+        quantity: parseInt(formData.quantity ?? 0),
+        cost_price: parseFloat(formData.cost_price ?? 0),
+        sale_price: parseFloat(formData.sale_price ?? 0),
+        profit_margin:
+          formData.cost_price && formData.sale_price
+            ? ((formData.sale_price - formData.cost_price) / formData.cost_price) * 100
+            : 0,
+      });
 
-const handleSubmit = async () => {
-  try {
-    if (!formData.id) {
-      showError("Produto sem ID para edição.");
-      return;
+      await fetchProducts();
+      showSuccess("Produto atualizado com sucesso.");
+      setIsModalOpen(false);
+    } catch (error) {
+      showError(error?.response?.data?.error || "Erro ao atualizar produto.");
     }
-await updateProduct(formData.id, {
-  product_name: formData.product_name,
-  barcode: formData.barcode,
-  description: formData.description,
-  quantity: parseInt(formData.quantity ?? 0),
-  cost_price: parseFloat(formData.cost_price ?? 0),
-  sale_price: parseFloat(formData.sale_price ?? 0),
-  profit_margin:
-    formData.cost_price && formData.sale_price
-      ? ((formData.sale_price - formData.cost_price) / formData.cost_price) * 100
-      : 0,
-});
+  };
 
-    await fetchProducts();
-    showSuccess("Produto atualizado com sucesso.");
-    setIsModalOpen(false);
-  } catch (error) {
-    showError(error?.response?.data?.error || "Erro ao atualizar produto.");
-  }
-};
+  const handleSave = async () => {
+    try {
+      if (!formData.product_name || !formData.barcode) {
+        showError("Preencha os campos obrigatórios: Nome e Código de Barras.");
+        return;
+      }
 
+      const productPayload = {
+        product_name: formData.product_name,
+        barcode: formData.barcode,
+        description: formData.description,
+        quantity: parseInt(formData.quantity ?? 0),
+        cost_price: parseFloat(formData.cost_price ?? 0),
+        sale_price: parseFloat(formData.sale_price ?? 0),
+        profit_margin:
+          formData.cost_price && formData.sale_price
+            ? ((formData.sale_price - formData.cost_price) / formData.cost_price) * 100
+            : 0,
+      };
 
-const handleSave = async () => {
-  try {
-    if (!formData.product_name || !formData.barcode) {
-      showError("Preencha os campos obrigatórios: Nome e Código de Barras.");
-      return;
+      await createProduct(productPayload);
+      await fetchProducts();
+      setIsAddModalOpen(false);
+      setFormData(initialProductData);
+      showSuccess("Produto criado com sucesso.");
+    } catch (error) {
+      showError(error?.response?.data?.error || "Erro ao cadastrar produto.");
     }
-
-const productPayload = {
-  product_name: formData.product_name,
-  barcode: formData.barcode,
-  description: formData.description,
-  quantity: parseInt(formData.quantity ?? 0),
-  cost_price: parseFloat(formData.cost_price ?? 0),
-  sale_price: parseFloat(formData.sale_price ?? 0),
-  profit_margin:
-    formData.cost_price && formData.sale_price
-      ? ((formData.sale_price - formData.cost_price) / formData.cost_price) * 100
-      : 0,
-};
-
-
-    await createProduct(productPayload);
-    await fetchProducts();
-    setIsAddModalOpen(false);
-    setFormData(initialProductData);
-    showSuccess("Produto criado com sucesso.");
-  } catch (error) {
-    showError(error?.response?.data?.error || "Erro ao cadastrar produto.");
-  }
-};
-
+  };
 
   const confirmDelete = async () => {
     try {
@@ -157,12 +151,12 @@ const productPayload = {
     }
   };
   const columns = [
-   {
-  key: "productName", 
-  title: "Produto",
-  sortable: true,
-  render: (_, p) => String(p.productName).toUpperCase(), 
-},
+    {
+      key: "product_name",
+      title: "Produto",
+      sortable: true,
+      render: (_, p) => String(p.product_name || "").toUpperCase(),
+    },
 
     {
       key: "barcode",
