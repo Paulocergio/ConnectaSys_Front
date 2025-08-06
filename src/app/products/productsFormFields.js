@@ -64,15 +64,7 @@ const ProductFormFields = memo(({ formData, onChange }) => {
         value={formData.description}
         onChange={onChange}
       />
-      <InputField
-        label="Quantidade Inicial"
-        name="quantity"
-        icon={<Hash size={18} />}
-        value={formData.quantity}
-        onChange={onChange}
-        type="number"
-        required
-      />
+     
       <InputField
         label="Preço de Custo (R$) *"
         name="cost_price"

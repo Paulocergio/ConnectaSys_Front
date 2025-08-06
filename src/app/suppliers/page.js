@@ -31,7 +31,7 @@ const initialSupplierData = {
 };
 import { useAuth } from "../../hooks/useAuth";
 export default function SuppliersPage() {
-   // verifica se o usuário está autenticado
+  // verifica se o usuário está autenticado
   useAuth();
   const [suppliers, setSuppliers] = useState([]);
   const [formData, setFormData] = useState(initialSupplierData);
@@ -248,8 +248,6 @@ export default function SuppliersPage() {
     () => <SuppliersFormFields formData={formData} onChange={handleChange} onFill={handleFill} />,
     [formData, handleChange, handleFill]
   );
-
-
 
   return (
     <div className="flex h-screen">

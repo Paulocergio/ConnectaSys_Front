@@ -12,27 +12,39 @@ import {
   showError,
   ToastContainerWrapper,
 } from "../../components/Toast/ToastNotification";
-import { getAllProducts } from "../../services/api/products";
 import {
+  getAllProducts,
   createProduct,
   updateProduct,
   deleteProduct,
-  createStockEntry,
 } from "../../services/api/products";
 import ProductFormFields from "../products/productsFormFields";
 import { Edit, Trash2 } from "lucide-react";
+
 const initialProductData = {
   product_name: "",
   barcode: "",
   description: "",
-  quantity: 0,
   cost_price: 0,
   sale_price: 0,
 };
 
+const SUCCESS_MESSAGES = {
+  create: "Produto cadastrado com sucesso!",
+  update: "Produto atualizado com sucesso!",
+  delete: "Produto excluído com sucesso!",
+};
+
+const ERROR_MESSAGES = {
+  create: "Erro ao cadastrar produto.",
+  update: "Erro ao atualizar produto.",
+  delete: "Erro ao excluir produto.",
+  load: "Erro ao carregar produtos.",
+};
+
 export default function Products() {
-  // verifica se o usuário está autenticado
   useAuth();
+
   const [products, setProducts] = useState([]);
   const [formData, setFormData] = useState(initialProductData);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
@@ -52,7 +64,7 @@ export default function Products() {
       }));
       setProducts(normalized);
     } catch (error) {
-      showError("Erro ao carregar produtos");
+      showError(ERROR_MESSAGES.load);
     }
   };
 
@@ -87,11 +99,11 @@ export default function Products() {
         showError("Produto sem ID para edição.");
         return;
       }
+
       await updateProduct(formData.id, {
         product_name: formData.product_name,
         barcode: formData.barcode,
         description: formData.description,
-        quantity: parseInt(formData.quantity ?? 0),
         cost_price: parseFloat(formData.cost_price ?? 0),
         sale_price: parseFloat(formData.sale_price ?? 0),
         profit_margin:
@@ -101,10 +113,10 @@ export default function Products() {
       });
 
       await fetchProducts();
-      showSuccess("Produto atualizado com sucesso.");
+      showSuccess(SUCCESS_MESSAGES.update);
       setIsModalOpen(false);
     } catch (error) {
-      showError(error?.response?.data?.error || "Erro ao atualizar produto.");
+      showError(error?.response?.data?.error || ERROR_MESSAGES.update);
     }
   };
 
@@ -119,7 +131,6 @@ export default function Products() {
         product_name: formData.product_name,
         barcode: formData.barcode,
         description: formData.description,
-        quantity: parseInt(formData.quantity ?? 0),
         cost_price: parseFloat(formData.cost_price ?? 0),
         sale_price: parseFloat(formData.sale_price ?? 0),
         profit_margin:
@@ -132,9 +143,9 @@ export default function Products() {
       await fetchProducts();
       setIsAddModalOpen(false);
       setFormData(initialProductData);
-      showSuccess("Produto criado com sucesso.");
+      showSuccess(SUCCESS_MESSAGES.create);
     } catch (error) {
-      showError(error?.response?.data?.error || "Erro ao cadastrar produto.");
+      showError(error?.response?.data?.error || ERROR_MESSAGES.create);
     }
   };
 
@@ -142,14 +153,15 @@ export default function Products() {
     try {
       await deleteProduct(itemToDelete.id);
       setProducts((prev) => prev.filter((p) => p.id !== itemToDelete.id));
-      showSuccess("Produto excluído com sucesso.");
+      showSuccess(SUCCESS_MESSAGES.delete);
     } catch (error) {
-      showError("Erro ao excluir produto.");
+      showError(ERROR_MESSAGES.delete);
     } finally {
       setIsDeleteModalOpen(false);
       setItemToDelete(null);
     }
   };
+
   const columns = [
     {
       key: "product_name",
@@ -157,7 +169,6 @@ export default function Products() {
       sortable: true,
       render: (_, p) => String(p.product_name || "").toUpperCase(),
     },
-
     {
       key: "barcode",
       title: "Código de Barras",
@@ -169,12 +180,6 @@ export default function Products() {
       title: "Descrição",
       sortable: false,
       render: (_, p) => (p.description ? String(p.description).toUpperCase() : "—"),
-    },
-    {
-      key: "quantity",
-      title: "Estoque",
-      sortable: true,
-      render: (_, p) => `${p.quantity ?? 0} un.`,
     },
     {
       key: "cost_price",
@@ -252,16 +257,17 @@ export default function Products() {
           onAddClick={handleAddClick}
         />
       </main>
-      {isAddModalOpen && (
-        <ModalAddGeneric
-          isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
-          onSave={handleSave}
-          title="Adicionar Produto"
-        >
-          <ProductFormFields formData={formData} onChange={handleChange} />
-        </ModalAddGeneric>
-      )}
+
+      <ToastContainerWrapper />
+
+      <ModalAddGeneric
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSave={handleSave}
+        title="Adicionar Produto"
+      >
+        <ProductFormFields formData={formData} onChange={handleChange} />
+      </ModalAddGeneric>
 
       <ModalEditGeneric
         isOpen={isModalOpen}

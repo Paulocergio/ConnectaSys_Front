@@ -19,20 +19,24 @@ import {
 
 export default function Sidebar({ toggleSidebar }) {
   const pathname = usePathname();
-const isSSR = typeof window === "undefined";
-const [collapsed, setCollapsed] = useState(isSSR ? false : (() => {
-  const saved = localStorage.getItem("sidebar-collapsed");
-  return saved === "true"; // força booleando
-}));
+  const isSSR = typeof window === "undefined";
+  const [collapsed, setCollapsed] = useState(
+    isSSR
+      ? false
+      : () => {
+          const saved = localStorage.getItem("sidebar-collapsed");
+          return saved === "true";
+        }
+  );
 
   const [isMobile, setIsMobile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [userInfo, setUserInfo] = useState({ 
-    email: "", 
-    firstName: "", 
-    lastName: "" 
+  const [userInfo, setUserInfo] = useState({
+    email: "",
+    firstName: "",
+    lastName: "",
   });
-  const [isLoaded, setIsLoaded] = useState(false); // Novo estado para controlar o carregamento
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const getInitial = (email) => {
     if (!email) return "U";
@@ -43,9 +47,6 @@ const [collapsed, setCollapsed] = useState(isSSR ? false : (() => {
     const checkScreenSize = () => {
       const isMobileSize = window.innerWidth < 768;
       setIsMobile(isMobileSize);
-      
-      // Não alterar o estado collapsed baseado no tamanho da tela
-      // Manter o estado atual independente do redimensionamento
     };
 
     checkScreenSize();
@@ -59,12 +60,11 @@ const [collapsed, setCollapsed] = useState(isSSR ? false : (() => {
     }
   }, [isMobile]);
 
-useEffect(() => {
-  if (typeof window !== "undefined") {
-    localStorage.setItem("sidebar-collapsed", JSON.stringify(collapsed));
-  }
-}, [collapsed]);
-
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("sidebar-collapsed", JSON.stringify(collapsed));
+    }
+  }, [collapsed]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -73,7 +73,6 @@ useEffect(() => {
   }, [collapsed]);
   useEffect(() => {
     if (typeof window !== "undefined") {
-      // Carrega imediatamente os dados em cache se existirem
       const stored = localStorage.getItem("user-data");
       if (stored) {
         try {
@@ -85,7 +84,7 @@ useEffect(() => {
           });
         } catch (e) {
           console.error("Erro ao ler user-data:", e);
-          // Define valores padrão em caso de erro
+
           setUserInfo({
             email: "usuario@exemplo.com",
             firstName: "Usuário",
@@ -93,30 +92,25 @@ useEffect(() => {
           });
         }
       } else {
-        // Define valores padrão se não houver dados
         setUserInfo({
           email: "usuario@exemplo.com",
           firstName: "Usuário",
           lastName: "Padrão",
         });
       }
-      setIsLoaded(true); // Marca como carregado
+      setIsLoaded(true);
     }
   }, []);
 
-  // Função de toggle simplificada - apenas alterna o estado collapsed
   const handleToggle = () => {
     setCollapsed(!collapsed);
   };
 
   const handleMobileToggle = () => setMobileMenuOpen(!mobileMenuOpen);
   const handleLinkClick = () => {
-    // No mobile, fecha o menu
     if (isMobile) {
       setMobileMenuOpen(false);
     }
-    // No desktop, NÃO altera o estado da sidebar
-    // Mantém o estado collapsed como está
   };
   const handleOverlayClick = () => setMobileMenuOpen(false);
 
@@ -125,9 +119,9 @@ useEffect(() => {
     { path: "/suppliers", label: "Fornecedores", icon: <Truck className="h-5 w-5" /> },
     { path: "/products", label: "Produtos", icon: <Package className="h-5 w-5" /> },
     { path: "/Users", label: "Usuários", icon: <Users className="h-5 w-5" /> },
+    { path: "/ServiceOrder", label: "Ordem de serviço", icon: <Users className="h-5 w-5" /> },
   ];
 
-  // Não renderiza até que os dados estejam carregados (evita piscada)
   if (!isLoaded) {
     return (
       <div className="h-full w-72 bg-gray-900 border-r border-gray-700/50 flex items-center justify-center">
@@ -149,7 +143,9 @@ useEffect(() => {
 
         <div
           className={`fixed inset-0 bg-gray-900/95 backdrop-blur-xl z-40 transform transition-all duration-300 ease-out md:hidden ${
-            mobileMenuOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full pointer-events-none"
+            mobileMenuOpen
+              ? "opacity-100 translate-x-0"
+              : "opacity-0 -translate-x-full pointer-events-none"
           }`}
           onClick={handleOverlayClick}
         >
@@ -179,8 +175,8 @@ useEffect(() => {
                     href={item.path}
                     onClick={handleLinkClick}
                     className={`flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      pathname === item.path 
-                        ? "bg-gray-800 text-white border border-gray-700/50" 
+                      pathname === item.path
+                        ? "bg-gray-800 text-white border border-gray-700/50"
                         : "text-gray-300 hover:bg-gray-800/50 hover:text-white"
                     }`}
                   >
@@ -212,14 +208,14 @@ useEffect(() => {
   }
 
   return (
-
-  <div
-  className={`h-full bg-gray-900 border-r border-gray-700/50 flex flex-col ${
-    collapsed ? "w-16" : "w-60 transition-all duration-300 ease-in-out"
-  }`}
->
-
-      <div className={`flex items-center ${collapsed ? "justify-center px-2 py-4" : "px-6 py-6"} border-b border-gray-700/50 relative`}>
+    <div
+      className={`h-full bg-gray-900 border-r border-gray-700/50 flex flex-col ${
+        collapsed ? "w-16" : "w-60 transition-all duration-300 ease-in-out"
+      }`}
+    >
+      <div
+        className={`flex items-center ${collapsed ? "justify-center px-2 py-4" : "px-6 py-6"} border-b border-gray-700/50 relative`}
+      >
         {!collapsed && (
           <div className="flex items-center">
             <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
@@ -259,9 +255,7 @@ useEffect(() => {
               key={item.path}
               href={item.path}
               className={`group relative flex items-center ${
-                collapsed 
-                  ? "justify-center w-10 h-10 mx-auto" 
-                  : "px-3 py-2.5"
+                collapsed ? "justify-center w-10 h-10 mx-auto" : "px-3 py-2.5"
               } rounded-lg text-sm font-medium transition-all duration-300 ${
                 pathname === item.path
                   ? collapsed
@@ -273,11 +267,11 @@ useEffect(() => {
               }`}
               title={collapsed ? item.label : ""}
             >
-              <span className={`transition-all duration-300 flex items-center justify-center ${
-                collapsed 
-                  ? "w-full h-full" 
-                  : "mr-3"
-              }`}>
+              <span
+                className={`transition-all duration-300 flex items-center justify-center ${
+                  collapsed ? "w-full h-full" : "mr-3"
+                }`}
+              >
                 {item.icon}
               </span>
               {!collapsed && (
@@ -288,8 +282,7 @@ useEffect(() => {
                   )}
                 </>
               )}
-              
-              {/* Tooltip para modo colapsado */}
+
               {collapsed && (
                 <div className="absolute left-full ml-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 border border-gray-700/50 shadow-xl">
                   {item.label}
@@ -325,10 +318,11 @@ useEffect(() => {
               title={`${userInfo.firstName} ${userInfo.lastName} - ${userInfo.email}`}
             >
               <span className="text-white font-bold text-sm">{getInitial(userInfo.email)}</span>
-              
-              {/* Tooltip para o usuário */}
+
               <div className="absolute left-full ml-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 border border-gray-700/50 shadow-xl">
-                <div className="font-medium">{userInfo.firstName} {userInfo.lastName}</div>
+                <div className="font-medium">
+                  {userInfo.firstName} {userInfo.lastName}
+                </div>
                 <div className="text-gray-400 text-xs">{userInfo.email}</div>
                 <div className="absolute top-1/2 -left-1 transform -translate-y-1/2 w-2 h-2 bg-gray-800 border-l border-t border-gray-700/50 rotate-45"></div>
               </div>
