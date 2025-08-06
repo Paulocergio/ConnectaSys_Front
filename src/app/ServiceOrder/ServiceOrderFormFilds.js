@@ -3,6 +3,7 @@
 import { ClipboardList, User, CalendarDays, Wrench, Clock } from "lucide-react";
 
 export default function ServiceOrderFormFields({ formData, onChange, customers }) {
+
   return (
     <>
       <div className="mb-4">
@@ -34,7 +35,6 @@ export default function ServiceOrderFormFields({ formData, onChange, customers }
         required
       />
 
-
       <InputField
         label="Data de Abertura"
         name="openedDate"
@@ -43,7 +43,7 @@ export default function ServiceOrderFormFields({ formData, onChange, customers }
         value={formData.openedDate}
         onChange={onChange}
       />
-      
+
       <InputField
         label="Data Agendada"
         name="scheduledDate"
@@ -51,7 +51,12 @@ export default function ServiceOrderFormFields({ formData, onChange, customers }
         type="date"
         value={formData.scheduledDate}
         onChange={onChange}
+        isLate={
+          formData.scheduledDate &&
+          new Date(formData.scheduledDate) < new Date().setHours(0, 0, 0, 0)
+        }
       />
+
       <InputField
         label="Valor Total"
         name="totalAmount"
@@ -62,12 +67,32 @@ export default function ServiceOrderFormFields({ formData, onChange, customers }
       />
       {/* vehicleId can be a hidden input or a select if needed */}
       <input type="hidden" name="vehicleId" value={formData.vehicleId} onChange={onChange} />
-      <input type="hidden" name="closedAt" value={formData.closedAt} onChange={onChange} />
+<input
+  type="hidden"
+  name="vehicleId"
+  value={formData.vehicleId ?? ""}
+  onChange={onChange}
+/>
+
+
     </>
   );
 }
 
-const InputField = ({ label, name, icon, value, onChange, type = "text", required = false }) => {
+const InputField = ({
+  label,
+  name,
+  icon,
+  value,
+  onChange,
+  type = "text",
+  required = false,
+  isLate = false,
+}) => {
+  const inputClasses = `w-full px-4 py-2.5 bg-gray-50 border rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 ${
+    isLate ? "border-red-500 focus:ring-red-500" : "border-gray-200 focus:ring-blue-500"
+  }`;
+
   return (
     <div className="mb-4">
       <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
@@ -76,10 +101,10 @@ const InputField = ({ label, name, icon, value, onChange, type = "text", require
       <input
         type={type}
         name={name}
-        value={value || ""}
+        value={value ?? ""}
         onChange={onChange}
         required={required}
-        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className={inputClasses}
       />
     </div>
   );

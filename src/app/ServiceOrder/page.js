@@ -46,6 +46,10 @@ export default function ServiceOrderPage() {
 
   const toggleSidebar = () => setIsSidebarCollapsed((prev) => !prev);
 
+
+
+  
+
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
@@ -122,6 +126,15 @@ export default function ServiceOrderPage() {
   };
 
   const handleSave = async () => {
+
+    const scheduledDate = new Date(`${formData.scheduledDate}T00:00:00`);
+const openedDate = new Date(`${formData.openedDate}T00:00:00`);
+
+if (scheduledDate < openedDate) {
+  showError("A Data Agendada tem que ser maior que a adata de Abertura .");
+  return;
+}
+
     const scheduledDateISO = formData.scheduledDate
       ? new Date(`${formData.scheduledDate}T00:00:00`).toISOString()
       : null;
