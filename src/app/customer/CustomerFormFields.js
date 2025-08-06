@@ -8,7 +8,7 @@ export default function CustomerFormFields({ formData, onChange }) {
       <InputField
         label="Nome"
         name="firstName"
-        icon={<User />}
+        icon={<User />} 
         value={formData.firstName}
         onChange={onChange}
         required
